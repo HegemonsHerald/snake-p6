@@ -1,10 +1,13 @@
 #/cygdrive/c/rakudo/bin/perl6.bat
 use v6;
 
+# This is a testing app, for practicing/learning/trying out perl6.
+# Notice how I'm purposefully randomly adding and not adding type boundaries?
+
 # HOISTING ====================================================================
 
 # a bound secret number
-my $secret-number := 33;
+constant $secret-number = 33;
 
 # prompt the user for a thingy-bajingy
 sub prompt-input {
