@@ -138,18 +138,32 @@ sub MAIN(Int $height=20, Int $width=80) {
 	
 	# init snake object
 	my $player1 = Snake.create();
-	say $player1.segments;
+
+
+	# **** TEMP ****
+	# function to output the current snake segments
+	sub say-snake {
+		print "|";
+		for $player1.segments -> $segment {
+			my $x = $segment.x;
+			my $y = $segment.y;
+			print "$x, $y |";
+		}
+		print "\n";
+	}
+
+	say-snake;
 
 	# move up
 	$player1.moveDir(Up);
-	say $player1.segments;
+	say-snake;
 
 	# move up and grow
 	$player1.moveDir(Up, True);
-	say $player1.segments;
+	say-snake;
 
 	# init motion timer
-	timer(1, -> { $player1.move(); say $player1.segments });
+	timer(1, -> { $player1.move(); say-snake });
 
 	sleep 100;
 }
