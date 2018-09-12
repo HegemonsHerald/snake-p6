@@ -153,3 +153,8 @@ sub MAIN(Int $height=20, Int $width=80) {
 
 	sleep 100;
 }
+
+
+# WHEN I'M DONE WITH THIS
+# I should draw out the structure of this program and see how spaghetti it really
+# is... That would also teach me how to refactor it -- and how to modularize it!
