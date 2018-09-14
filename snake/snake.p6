@@ -229,7 +229,7 @@ sub MAIN(Int $height=80, Int $width=10) {
 	# init motion timer
 	timer(1, -> {
 		if !$player1.move(True) {
-			return False;
+			return False
 		}
 		say-snake
 	});
