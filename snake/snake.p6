@@ -21,7 +21,7 @@ enum Direction <Up Down Left Right>;
 class Snake {
 	has @.segments;
 	has $.score = 0;
-	has $.direction = Left;
+	has $.direction is rw = Left;
 
 	# Creation shorthand, takes settings for the width and height
 	method create {
@@ -39,38 +39,73 @@ class Snake {
 	method move( Bool $grow=False ) {
 
 		# Insert a segment in the front
-		self!insert-front();
+		unless !self!insert-front() {
+		# If the motion fails, there is no reason to pop from the tail
 
-		# Unless you want to grow
-		unless $grow {
-			# Remove a piece from the end of the snake, so it doesn't grow
-			self!pop-tail();
+			# Unless you want to grow
+			unless $grow {
+				# Remove a piece from the end of the snake, so it doesn't grow
+				self!pop-tail();
+			}
+
+			# Return Successfully, cause the movement was executed collision-less
+			return True;
 		}
+
+		# If the movement failed, that means Game Over
+		return False;
 	}
 
 	# Move in a specific direction
 	method moveDir( Direction $dir, Bool $grow=False ) {
 
 		# Insert a segment in the specified direction
-		self!insert-front($dir);
+		unless !self!insert-front($dir) {
+		# If the motion fails, there is no reason to pop from the tail
 
-		# Unless you want to grow
-		unless $grow {
-			# Remove a piece from the tail of the snake, so it doesn't grow
-			self!pop-tail();
+			# Unless you want to grow
+			unless $grow {
+				# Remove a piece from the tail of the snake, so it doesn't grow
+				self!pop-tail();
+			}
+
+			# Return Successfully, cause the movement was executed collision-less
+			return True;
 		}
+
+		return False;
 	}
 
 	# Insert a new segment at the snake's head
-	method !insert-front( Direction $dir=self.direction ) {
+	method !insert-front( Direction $dir=self.direction ) returns Bool {
 
-		# run collision detection: Is it even possible to insert?
+		# Direction Control: the snake can only turn 90 degrees
+		if !self!check-turn($dir) {
+			say "Uh-oh, that was an illegal turn";
+
+			# Illegal turns are no Game Over event, but just mean nothing happens, so return
+			return True;
+		}
 
 		# Compute new position
 		my $point = self!compute-new-point($dir);
 
+		# Collision Detection: Is it even possible to insert?
+		if self!collision($point) {
+			say "Uh-oH, that was a collision!";
+
+			# Self Collisions mean Game Over
+			return False;
+		}
+
 		# Add new point to the beginning of the Snake
 		self.segments.prepend: $point;
+
+		# Change previous direction to current direction
+		self.direction = $dir;
+
+		# Moving was successfull!
+		return True;
 	}
 
 	# Delete the last segment of the snake
@@ -79,7 +114,7 @@ class Snake {
 	}
 
 	# Compute a Point to insert in the front
-	method !compute-new-point( Direction $dir, Bool $wrap-around=False ) returns Point {
+	method !compute-new-point( Direction $dir ) returns Point {
 		# If wrap-around the snake has hit a wall
 
 		# Get the current head's position
@@ -88,16 +123,40 @@ class Snake {
 
 		# Check in which direction to move
 		given $dir {
-			when Up { $y++ }
-			when Down { $y-- }
-			when Right { $x++ }
-			when Left { $x-- }
+			when Up {
+				$y--;
+				# TODO I don't know, whether ncurses screens are zero-indexed or one-indexed
+				if $y == 0 {
+					$y = $HEIGHT;
+				}
+			}
+			when Down { $y++; if $y == $HEIGHT { $y=0 } }
+			when Right { $x++; if $x == $WIDTH { $x=0 } }
+			when Left { $x--; if $x == 0 { $x=$WIDTH } }
 		}
 
 		# Return the new head's point
 		Point.new( x => $x, y => $y );
 	}
 
+	# 90 Degrees turning test, returns True if turn possible
+	method !check-turn( Direction $dir ) {
+		if $dir == Left && self.direction == Right { return False }
+		if $dir == Right && self.direction == Left { return False }
+		if $dir == Down && self.direction == Up { return False }
+		if $dir == Up && self.direction == Down { return False }
+		return True
+	}
+
+	# Collision Detection, if the target point is already in the snake this returns true
+	method !collision( Point $point ) {
+		for self.segments -> $segment {
+			if $segment.x == $point.x && $segment.y == $point.y {
+				return True;
+			}
+		}
+		return False
+	}
 }
 
 # Object to hold the settings
@@ -123,11 +182,15 @@ sub timer(Int $seconds, $lambda) {
 	});
 }
 
+# Function that wraps up the Game upon Self-Collision
+sub game-over {
+	say "Game Over";
+}
 
 # Run
 
 # Get command line arguments and start the game
-sub MAIN(Int $height=20, Int $width=80) {
+sub MAIN(Int $height=80, Int $width=10) {
 
 	# Assign Global Variables
 	our $HEIGHT = $height;
@@ -154,16 +217,22 @@ sub MAIN(Int $height=20, Int $width=80) {
 
 	say-snake;
 
+
 	# move up
 	$player1.moveDir(Up);
 	say-snake;
 
 	# move up and grow
-	$player1.moveDir(Up, True);
+	$player1.moveDir(Left, True);
 	say-snake;
 
 	# init motion timer
-	timer(1, -> { $player1.move(); say-snake });
+	timer(1, -> {
+		if !$player1.move(True) {
+			return False;
+		}
+		say-snake
+	});
 
 	sleep 100;
 }
