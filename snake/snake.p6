@@ -4,6 +4,7 @@ use v6;
 # Declare Global Variables (assignment in MAIN function)
 our $HEIGHT;
 our $WIDTH;
+our $GAME-OVER;
 
 
 # Class Definitions
@@ -20,8 +21,9 @@ enum Direction <Up Down Left Right>;
 # Snake object
 class Snake {
 	has @.segments;
-	has $.score = 0;
+	has $.score is rw = 0;
 	has $.direction is rw = Left;
+	has $.game-over is rw = False;
 
 	# Creation shorthand, takes settings for the width and height
 	method create {
@@ -46,14 +48,13 @@ class Snake {
 			unless $grow {
 				# Remove a piece from the end of the snake, so it doesn't grow
 				self!pop-tail();
+				return;
 			}
-
-			# Return Successfully, cause the movement was executed collision-less
-			return True;
+			return;
 		}
 
-		# If the movement failed, that means Game Over
-		return False;
+		# If the motion was unsuccessfull, this snake is DEAD!
+		self.game-over = True;
 	}
 
 	# Move in a specific direction
@@ -67,13 +68,13 @@ class Snake {
 			unless $grow {
 				# Remove a piece from the tail of the snake, so it doesn't grow
 				self!pop-tail();
+				return;
 			}
-
-			# Return Successfully, cause the movement was executed collision-less
-			return True;
+			return;
 		}
 
-		return False;
+		# If the motion was unsuccessfull, this snake is DEAD!
+		self.game-over = True;
 	}
 
 	# Insert a new segment at the snake's head
@@ -173,16 +174,28 @@ class Settings {
 # Function Definitions
 
 # Async timer that runs specified lambda after n seconds
-sub timer(Int $seconds, $lambda) {
-	my $sleeper = Promise.in($seconds);
+sub timer(Int $seconds, $lambda, Snake $snake) {
 
-	$sleeper.then({
-		$lambda();
-		timer( $seconds, $lambda );
-	});
+	# As long as the game's going strong
+	unless $snake.game-over {
+
+		# Timeout
+		my $sleeper = Promise.in($seconds);
+
+		# Callback
+		$sleeper.then({
+			$lambda();
+			timer( $seconds, $lambda, $snake );
+		});
+	}
+
+	# If the game's over
+	if $snake.game-over {
+		game-over
+	}
 }
 
-# Function that wraps up the Game upon Self-Collision
+# Function that wraps up the Game upon Game Over Condition
 sub game-over {
 	say "Game Over";
 }
@@ -195,16 +208,17 @@ sub MAIN(Int $height=80, Int $width=10) {
 	# Assign Global Variables
 	our $HEIGHT = $height;
 	our $WIDTH = $width;
+	our $GAME-OVER = False;
 
-	# init settings object
+	# Init settings object
 	my $settings = Settings.create(0.25);
 	
-	# init snake object
+	# Init snake object
 	my $player1 = Snake.create();
 
 
 	# **** TEMP ****
-	# function to output the current snake segments
+	# Function to output the current snake segments
 	sub say-snake {
 		print "|";
 		for $player1.segments -> $segment {
@@ -218,21 +232,19 @@ sub MAIN(Int $height=80, Int $width=10) {
 	say-snake;
 
 
-	# move up
+	# Move up
 	$player1.moveDir(Up);
 	say-snake;
 
-	# move up and grow
+	# Move up and grow
 	$player1.moveDir(Left, True);
 	say-snake;
 
-	# init motion timer
+	# Init motion timer
 	timer(1, -> {
-		if !$player1.move(True) {
-			return False
-		}
+		$player1.move(True);
 		say-snake
-	});
+	}, $player1);
 
 	sleep 100;
 }
