@@ -5,6 +5,8 @@ use v6;
 our $HEIGHT;
 our $WIDTH;
 our $GAME-OVER;
+our $settings;
+our $player1;
 
 
 # Class Definitions
@@ -54,7 +56,7 @@ class Snake {
 		}
 
 		# If the motion was unsuccessfull, this snake is DEAD!
-		self.game-over = True;
+		$GAME-OVER = True;
 	}
 
 	# Move in a specific direction
@@ -74,7 +76,7 @@ class Snake {
 		}
 
 		# If the motion was unsuccessfull, this snake is DEAD!
-		self.game-over = True;
+		$GAME-OVER = True;
 	}
 
 	# Insert a new segment at the snake's head
@@ -174,10 +176,10 @@ class Settings {
 # Function Definitions
 
 # Async timer that runs specified lambda after n seconds
-sub timer(Int $seconds, $lambda, Snake $snake) {
+sub timer(Int $seconds, $lambda) {
 
 	# As long as the game's going strong
-	unless $snake.game-over {
+	unless $GAME-OVER {
 
 		# Timeout
 		my $sleeper = Promise.in($seconds);
@@ -185,14 +187,19 @@ sub timer(Int $seconds, $lambda, Snake $snake) {
 		# Callback
 		$sleeper.then({
 			$lambda();
-			timer( $seconds, $lambda, $snake );
+			timer( $seconds, $lambda);
 		});
 	}
 
 	# If the game's over
-	if $snake.game-over {
+	if $GAME-OVER {
 		game-over
 	}
+}
+
+# Function that draws the initial Screen
+sub game-start {
+	say "SNAKE! To play please press any button";
 }
 
 # Function that wraps up the Game upon Game Over Condition
@@ -200,24 +207,8 @@ sub game-over {
 	say "Game Over";
 }
 
-# Run
 
-# Get command line arguments and start the game
-sub MAIN(Int $height=80, Int $width=10) {
-
-	# Assign Global Variables
-	our $HEIGHT = $height;
-	our $WIDTH = $width;
-	our $GAME-OVER = False;
-
-	# Init settings object
-	my $settings = Settings.create(0.25);
-	
-	# Init snake object
-	my $player1 = Snake.create();
-
-
-	# **** TEMP ****
+# **** TEMP ****
 	# Function to output the current snake segments
 	sub say-snake {
 		print "|";
@@ -229,24 +220,54 @@ sub MAIN(Int $height=80, Int $width=10) {
 		print "\n";
 	}
 
+
+
+# Run
+
+# Get command line arguments and start the game
+sub MAIN(Int $height=80, Int $width=10) {
+
+	# Setup
+
+	# Assign Global Variables
+	our $HEIGHT = $height;
+	our $WIDTH = $width;
+
+	# Init settings object
+	our $settings = Settings.create(0.25);
+	
+	# Init snake object
+	our $player1 = Snake.create();
+
+	# Init the Ncurses Buffers
+
+
+	# Execution
+
+
+
+	
+
+	run
+}
+
+sub run {
+	# Draw the Initial Screen and await Start event
+	game-start;
+
+
 	say-snake;
 
-
-	# Move up
-	$player1.moveDir(Up);
-	say-snake;
-
-	# Move up and grow
-	$player1.moveDir(Left, True);
-	say-snake;
-
-	# Init motion timer
+	# Init motion timer for player1
 	timer(1, -> {
 		$player1.move(True);
 		say-snake
-	}, $player1);
+	});
 
-	sleep 100;
+	# Start reading Keyboard Events for player1
+
+
+	sleep 60;
 }
 
 
