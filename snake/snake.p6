@@ -175,7 +175,7 @@ class Settings {
 
 # Function Definitions
 
-# Async timer that runs specified lambda after n seconds
+# Async timer, that runs specified lambda after n seconds
 sub timer(Int $seconds, $lambda) {
 
 	# As long as the game's going strong
@@ -273,7 +273,12 @@ sub game {
 	});
 
 	# Start reading Keyboard Events for player1
-
+	my $key-listener = Promise.start({
+		my $key = prompt "wheee";
+	});
+	$key-listener.then({
+		say "yay"
+	});
 
 	while !$GAME-OVER {}
 
@@ -284,3 +289,9 @@ sub game {
 # WHEN I'M DONE WITH THIS
 # I should draw out the structure of this program and see how spaghetti it really
 # is... That would also teach me how to refactor it -- and how to modularize it!
+
+
+
+
+# REWRITE THE TIMER WITH SUPPLY.INTERVAL
+# create async prompt mechanism with supply (no recursion)
