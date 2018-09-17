@@ -193,7 +193,7 @@ sub timer(Int $seconds, $lambda) {
 
 	# If the game's over
 	if $GAME-OVER {
-		game-over
+		# game-over
 	}
 }
 
@@ -209,16 +209,16 @@ sub game-over {
 
 
 # **** TEMP ****
-	# Function to output the current snake segments
-	sub say-snake {
-		print "|";
-		for $player1.segments -> $segment {
-			my $x = $segment.x;
-			my $y = $segment.y;
-			print "$x, $y |";
-		}
-		print "\n";
+# Function to output the current snake segments
+sub say-snake {
+	print "|";
+	for $player1.segments -> $segment {
+		my $x = $segment.x;
+		my $y = $segment.y;
+		print "$x, $y |";
 	}
+	print "\n";
+}
 
 
 
@@ -241,19 +241,17 @@ sub MAIN(Int $height=80, Int $width=10) {
 
 	# Init the Ncurses Buffers
 
+	game-start;
 
 	# Execution
+	game
 
-
-
-	
-
-	run
+	# Await game-over Input (Restart or Quit events)
 }
 
-sub run {
+sub game {
 	# Draw the Initial Screen and await Start event
-	game-start;
+	# game-start;
 
 
 	say-snake;
@@ -261,13 +259,25 @@ sub run {
 	# Init motion timer for player1
 	timer(1, -> {
 		$player1.move(True);
-		say-snake
+		unless $GAME-OVER {
+			say-snake
+		}
+
+		# Note: the GAME-OVER check here is necessary, cause the check
+		# in the timer sub sometimes gets the timing wrong and makes a
+		# recursive call, even though GAME-OVER over is set within a
+		# millisecond or so. In that case another render is kicked off
+		# that may interfere with the game-over() subroutine, unless I
+		# check for GAME-OVER at every position a render update is
+		# made!
 	});
 
 	# Start reading Keyboard Events for player1
 
 
-	sleep 60;
+	while !$GAME-OVER {}
+
+	game-over;
 }
 
 
