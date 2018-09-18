@@ -275,38 +275,6 @@ sub game {
 	timer($player1);
 
 
-	# Let's make a migrator
-	my Supplier $supplier-cont = Supplier.new;
-
-	# the * matches against the outputs of the tap, which are supplies!
-	# the .say makes the supplies be replaced by new supplies, as they come in!
-	$supplier-cont.Supply.migrate.tap: *.say;
-	# what comes out of the tap is stuff like this:
-	#   supply { Supply.interval($n).act(->$v{say$v}) }
-	# .say outputs that code in a format, that makes the compiler execute it... bit like a runtime-macro
-	
-
-	sub change-sup($n) {
-
-		# using the supply keyword means, that a supply is emmitted
-		$supplier-cont.emit( supply {
-
-			# you have to define the supply and all its callbacks in this supply {} block
-			# for some reason you also have to either use .act or whenever to react to the
-			# supply, which makes the execution strictly single-threaded
-			whenever Supply.interval($n) -> $v {
-				say $v;
-			}
-			# you can't have the taps be created outside this supply {} block, cause that would
-			# screw with the execution of the block; whenever a migration is made, the supply
-			# is changed and the outside-taps become invalid... I think
-		});
-	}
-
-	
-	change-sup(2);
-	sleep 4;
-	change-sup(0.2);
 
 
 	# Start reading Keyboard Events for player1
@@ -346,4 +314,6 @@ sub game {
 
 
 # rewrite timer
-#  - implement speed change → migrate supply
+
+#  - implement speed change → quit and reset interval
+#  - implement auto growth → players hold a growth count, that is checked by the move subs
