@@ -175,26 +175,34 @@ class Settings {
 
 # Function Definitions
 
-# Async timer, that runs specified lambda after n seconds
-sub timer(Int $seconds, $lambda) {
+# Snake Motion Timer
+sub timer($snake) {
 
-	# As long as the game's going strong
-	unless $GAME-OVER {
-
-		# Timeout
-		my $sleeper = Promise.in($seconds);
-
-		# Callback
-		$sleeper.then({
-			$lambda();
-			timer( $seconds, $lambda);
-		});
-	}
+	my $interval = Supply.interval(1, 1);
+	$interval.tap( -> $v {
+		$snake.move(True);
+		render;
+	});
 
 	# If the game's over
 	if $GAME-OVER {
-		# game-over
+		$interval.quit;
 	}
+}
+
+# Render Function
+sub render {
+	unless $GAME-OVER {
+		say-snake
+	}
+
+	# Note: the GAME-OVER check here is necessary, cause the check
+	# in the timer sub sometimes gets the timing wrong and makes a
+	# recursive call, even though GAME-OVER over is set within a
+	# millisecond or so. In that case another render is kicked off
+	# that may interfere with the game-over() subroutine, unless I
+	# check for GAME-OVER at every position a render update is
+	# made!
 }
 
 # Function that draws the initial Screen
@@ -254,23 +262,10 @@ sub game {
 	# game-start;
 
 
-	say-snake;
+	render;
 
 	# Init motion timer for player1
-	timer(1, -> {
-		$player1.move(True);
-		unless $GAME-OVER {
-			say-snake
-		}
-
-		# Note: the GAME-OVER check here is necessary, cause the check
-		# in the timer sub sometimes gets the timing wrong and makes a
-		# recursive call, even though GAME-OVER over is set within a
-		# millisecond or so. In that case another render is kicked off
-		# that may interfere with the game-over() subroutine, unless I
-		# check for GAME-OVER at every position a render update is
-		# made!
-	});
+	timer($player1);
 
 	# Start reading Keyboard Events for player1
 	my $supplier = Supplier.new;
@@ -294,9 +289,6 @@ sub game {
 	# go out of scope with the game's end!
 
 
-	my $timer-supply = Supply.interval(1, 1);
-	$timer-supply.tap( -> $v { say "$v seconds have elapsed"});
-
 
 	while !$GAME-OVER {}
 
@@ -311,4 +303,7 @@ sub game {
 
 
 
-# REWRITE THE TIMER WITH SUPPLY.INTERVAL
+# rewrite timer
+#  - pass player along instead of the whole lambda
+#  - implement speed change → quit and reset interval
+#  - implement auto growth → players hold a growth count, that is checked by the move subs
