@@ -26,6 +26,7 @@ class Snake {
 	has $.score is rw = 0;
 	has $.direction is rw = Left;
 	has $.game-over is rw = False;
+	has $!growth is rw = 10;
 
 	# Creation shorthand, takes settings for the width and height
 	method create {
@@ -40,18 +41,22 @@ class Snake {
 	}
 
 	# Move in previous direction
-	method move( Bool $grow=False ) {
+	method move() {
 
 		# Insert a segment in the front
 		unless !self!insert-front() {
 		# If the motion fails, there is no reason to pop from the tail
 
 			# Unless you want to grow
-			unless $grow {
+			unless $!growth > 0 {
 				# Remove a piece from the end of the snake, so it doesn't grow
 				self!pop-tail();
 				return;
 			}
+
+			# If you grew by a piece, you now have to grow less
+			$!growth--;
+
 			return;
 		}
 
@@ -60,18 +65,22 @@ class Snake {
 	}
 
 	# Move in a specific direction
-	method moveDir( Direction $dir, Bool $grow=False ) {
+	method moveDir( Direction $dir ) {
 
 		# Insert a segment in the specified direction
 		unless !self!insert-front($dir) {
 		# If the motion fails, there is no reason to pop from the tail
 
 			# Unless you want to grow
-			unless $grow {
+			unless $!growth > 0 {
 				# Remove a piece from the tail of the snake, so it doesn't grow
 				self!pop-tail();
 				return;
 			}
+
+			# If you grew by a piece, you now have to grow less
+			$!growth--;
+
 			return;
 		}
 
@@ -180,7 +189,7 @@ sub timer($snake) {
 
 	my $interval = Supply.interval(1, 1);
 	$interval.tap( -> $v {
-		$snake.move(True);
+		$snake.move();
 		render;
 	});
 
@@ -258,14 +267,15 @@ sub MAIN(Int $height=80, Int $width=10) {
 }
 
 sub game {
-	# Draw the Initial Screen and await Start event
-	# game-start;
 
-
+	# Kick off rendering
 	render;
 
 	# Init motion timer for player1
 	timer($player1);
+
+
+
 
 	# Start reading Keyboard Events for player1
 	my $supplier = Supplier.new;
