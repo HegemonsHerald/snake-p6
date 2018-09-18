@@ -273,12 +273,30 @@ sub game {
 	});
 
 	# Start reading Keyboard Events for player1
-	my $key-listener = Promise.start({
-		my $key = prompt "wheee";
-	});
-	$key-listener.then({
-		say "yay"
-	});
+	my $supplier = Supplier.new;
+	my $supply = $supplier.Supply;
+	$supply.tap( -> $v { say "$v" });
+
+	sub key-listener(Supplier $sup) {
+		my $async = Promise.start({
+			loop {
+				$sup.emit(get)
+			}
+		});
+	}
+
+	key-listener($supplier);
+
+	# so here's the plan for the key-listener:
+	# listen to all revant keys by default, depending on what context you're in,
+	# change the behaviour of the the supplied... → you can just create the supplies for
+	# the motion keys in the game functions and let them (and thereby the handling-behaviour)
+	# go out of scope with the game's end!
+
+
+	my $timer-supply = Supply.interval(1, 1);
+	$timer-supply.tap( -> $v { say "$v seconds have elapsed"});
+
 
 	while !$GAME-OVER {}
 
@@ -294,4 +312,3 @@ sub game {
 
 
 # REWRITE THE TIMER WITH SUPPLY.INTERVAL
-# create async prompt mechanism with supply (no recursion)
