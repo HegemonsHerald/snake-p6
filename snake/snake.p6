@@ -187,16 +187,69 @@ class Settings {
 # Snake Motion Timer
 sub timer($snake) {
 
-	my $interval = Supply.interval(1, 1);
-	$interval.tap( -> $v {
-		$snake.move();
-		render;
-	});
+	# A supplier to supply the interval supplies
+	my $meta-supplier = Supplier.new;
 
-	# If the game's over
-	if $GAME-OVER {
-		$interval.quit;
+	# For each thing (*) coming from $meta-supplier do: .say
+	$meta-supplier.Supply.migrate.tap: *.say;
+	# .say on a supply-block executes the code, so the supplies,
+	# that are returned from this tap are executed
+
+	# A function to change the speed of the movement interval
+	sub change-interval($n) {
+
+		# Emit a new interval supply
+		$meta-supplier.emit( supply {
+			whenever Supply.interval($n) -> $v {
+				$snake.move;
+				render;
+			}
+
+			# Note: You have to use whenever or .act here,
+			# because if the handler isn't run single-threaded it
+			# doesn't work for some reason...
+			# Also, the supply handler has to be defined in
+			# this supply-block, because outside it the handler
+			# would only run on one of the supplies coming down
+			# $meta-handler's tap!
+		})
 	}
+
+	# Calculate new speed in seconds
+	sub new-speed {
+		return ( 1 - ( $snake.score div 5 / 10 ) )
+	}
+
+	# Kickoff a first interval, with the default speed
+	change-interval(1);
+
+	# Counter, that holds the score of the last speed change
+	my $speed-counter = 0;
+
+	# Change the speed concurrently
+	Promise.start({
+
+		# Only while the game is running
+		while !$GAME-OVER {
+
+			# If the score has increased by 5
+			if $speed-counter <= ($snake.score - 5) {
+
+				# Set a new interval speed
+				change-interval(new-speed);
+
+				# And update the counter
+				$speed-counter = $snake.score
+			}
+		}
+
+		# If the Game has ended
+		if $GAME-OVER {
+
+			# Quit the interval, just to be sure... the supply and supplier go out of scope here anyways
+			$meta-supplier.done;
+		}
+	})
 }
 
 # Render Function
@@ -274,41 +327,6 @@ sub game {
 	# Init motion timer for player1
 	timer($player1);
 
-
-	# Let's make a migrator
-	my Supplier $supplier-cont = Supplier.new;
-
-	# the * matches against the outputs of the tap, which are supplies!
-	# the .say makes the supplies be replaced by new supplies, as they come in!
-	$supplier-cont.Supply.migrate.tap: *.say;
-	# what comes out of the tap is stuff like this:
-	#   supply { Supply.interval($n).act(->$v{say$v}) }
-	# .say outputs that code in a format, that makes the compiler execute it... bit like a runtime-macro
-	
-
-	sub change-sup($n) {
-
-		# using the supply keyword means, that a supply is emmitted
-		$supplier-cont.emit( supply {
-
-			# you have to define the supply and all its callbacks in this supply {} block
-			# for some reason you also have to either use .act or whenever to react to the
-			# supply, which makes the execution strictly single-threaded
-			whenever Supply.interval($n) -> $v {
-				say $v;
-			}
-			# you can't have the taps be created outside this supply {} block, cause that would
-			# screw with the execution of the block; whenever a migration is made, the supply
-			# is changed and the outside-taps become invalid... I think
-		});
-	}
-
-	
-	change-sup(2);
-	sleep 4;
-	change-sup(0.2);
-
-
 	# Start reading Keyboard Events for player1
 	my $supplier = Supplier.new;
 	my $supply = $supplier.Supply;
@@ -331,7 +349,6 @@ sub game {
 	# go out of scope with the game's end!
 
 
-
 	while !$GAME-OVER {}
 
 	game-over;
@@ -343,7 +360,3 @@ sub game {
 # is... That would also teach me how to refactor it -- and how to modularize it!
 
 
-
-
-# rewrite timer
-#  - implement speed change → migrate supply
