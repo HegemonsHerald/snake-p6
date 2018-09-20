@@ -171,6 +171,39 @@ class Snake {
 	}
 }
 
+# Food object
+class Food {
+	has $.position;
+
+	method next {
+		$.position = self!point;
+	}
+
+	method new {
+		my $position = self!point;
+		return self.bless(:$position)
+	}
+
+	method !point {
+		my $px = $WIDTH.rand.floor;
+		my $py = $HEIGHT.rand.floor;
+
+		say "$py	$px";
+		say "$HEIGHT	$WIDTH";
+
+		# Here's how you can destructure an Object, note that you have to use the field's actual names
+		# and therefore can't also have other vars of the same names
+		for $player1.segments -> Point $P (:$x, :$y) {
+			if $x == $px || $y == $py {
+				return self!point
+			}
+		}
+
+		# And you can use the precendence syntax for method calls whenever you don't have any method chaining going on
+		return Point.new: x => $px, y => $py;
+	}
+}
+
 # Object to hold the settings
 class Settings {
 	has $.high-score;
@@ -306,9 +339,6 @@ sub MAIN(Int $height=80, Int $width=10) {
 	# Init settings object
 	our $settings = Settings.create(0.25);
 	
-	# Init snake object
-	our $player1 = Snake.create();
-
 	# Init the Ncurses Buffers
 
 	game-start;
@@ -320,6 +350,12 @@ sub MAIN(Int $height=80, Int $width=10) {
 }
 
 sub game {
+
+	# Init snake object
+	our $player1 = Snake.create();
+
+	# Init food object
+	our $food = Food.new();
 
 	# Kick off rendering
 	render;
