@@ -73,7 +73,9 @@ class Snake {
 
 		# Calculate new speed in seconds
 		sub new-speed {
-			return ( 1 - ( $.score div 5 / 10 ) )
+
+			# for every 5 score points increase the speed by 0.1 seconds between ticks
+			return ( 1 - ( ($.score / 5).floor / 10 ) )
 		}
 
 		# Kickoff a first interval, with the default speed
@@ -485,8 +487,7 @@ sub game {
 
 
 # TODO
-# Refactor so you could extend with multi-player and you aren't using specific vars in global context anymore!
-#  → draw out the codes structure for that (print it first in like 8pt or sth, use 'highlight')
+# make score, growth rate and speed change rate more sensible with delta vars in the settings!
 
 # WHEN I'M DONE WITH THIS
 # I should draw out the structure of this program and see how spaghetti it really
