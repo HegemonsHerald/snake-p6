@@ -29,7 +29,7 @@ class Snake {
 	has $.game-over is rw = False;
 	has $!growth is rw = 10;
 
-	# Creation shorthand, takes settings for the width and height
+	# Creation shorthand
 	method create {
 
 		# Put the Snake in the screen middle
@@ -39,6 +39,73 @@ class Snake {
 
 		# Create the Snake!
 		self.new(segments => ($start-point));
+	}
+
+	# Motion Timer
+	method timer {
+		# A supplier to supply the interval supplies
+		my $meta-supplier = Supplier.new;
+
+		# For each thing (*) coming from $meta-supplier do: .say
+		$meta-supplier.Supply.migrate.tap: *.say;
+		# .say on a supply-block executes the code, so the supplies,
+		# that are returned from this tap are executed
+
+		# A function to change the speed of the movement interval
+		sub change-interval($n) {
+
+			# Emit a new interval supply
+			$meta-supplier.emit( supply {
+				whenever Supply.interval($n) -> $v {
+					self.move;
+					render;
+				}
+
+				# Note: You have to use whenever or .act here,
+				# because if the handler isn't run single-threaded it
+				# doesn't work for some reason...
+				# Also, the supply handler has to be defined in
+				# this supply-block, because outside it the handler
+				# would only run on one of the supplies coming down
+				# $meta-handler's tap!
+			})
+		}
+
+		# Calculate new speed in seconds
+		sub new-speed {
+			return ( 1 - ( $.score div 5 / 10 ) )
+		}
+
+		# Kickoff a first interval, with the default speed
+		change-interval(1);
+
+		# Counter, that holds the score of the last speed change
+		my $speed-counter = 0;
+
+		# Change the speed concurrently
+		Promise.start({
+
+			# Only while the game is running
+			while !$GAME-OVER {
+
+				# If the score has increased by 5
+				if $speed-counter <= ($.score - 5) {
+
+					# Set a new interval speed
+					change-interval(new-speed);
+
+					# And update the counter
+					$speed-counter = $.score
+				}
+			}
+
+			# If the Game has ended
+			if $GAME-OVER {
+
+				# Quit the interval, just to be sure... the supply and supplier go out of scope here anyways
+				$meta-supplier.done;
+			}
+		})
 	}
 
 	# Move in previous direction
@@ -141,7 +208,7 @@ class Snake {
 		Point.new( x => $x, y => $y );
 	}
 
-	# 90 Degrees turning test, returns True if turn possible
+	# 0 to 90 Degrees turning test, returns True if turn possible (90 degrees or less)
 	method !check-turn( Direction $dir ) {
 		if $dir == Left && self.direction == Right { return False }
 		if $dir == Right && self.direction == Left { return False }
@@ -304,6 +371,13 @@ sub timer($snake) {
 	})
 }
 
+# Make the Snake(s) move
+sub init-timers {
+	for @PLAYERS -> $player {
+		$player.timer
+	}
+}
+
 # Render Function
 sub render {
 	unless $GAME-OVER {
@@ -377,11 +451,12 @@ sub game {
 	# Init foods
 	our @FOODS = [ Food.new() ];
 
+	# Init timers
+	init-timers;
+
 	# Kick off rendering
 	render;
 
-	# Init motion timer for player1
-	timer(@PLAYERS[0]);
 
 	# Start reading Keyboard Events for player1
 	my $supplier = Supplier.new;
