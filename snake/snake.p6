@@ -7,6 +7,7 @@ our $WIDTH;
 our $GAME-OVER;
 our $settings;
 our $player1;
+our $food;
 
 
 # Class Definitions
@@ -41,7 +42,7 @@ class Snake {
 	}
 
 	# Move in previous direction
-	method move() {
+	multi method move() {
 
 		# Insert a segment in the front
 		unless !self!insert-front() {
@@ -65,31 +66,20 @@ class Snake {
 	}
 
 	# Move in a specific direction
-	method moveDir( Direction $dir ) {
+	multi method move( Direction $dir ) {
 
-		# Insert a segment in the specified direction
-		unless !self!insert-front($dir) {
-		# If the motion fails, there is no reason to pop from the tail
+		# Set the direction
+		$!direction = $dir;
 
-			# Unless you want to grow
-			unless $!growth > 0 {
-				# Remove a piece from the tail of the snake, so it doesn't grow
-				self!pop-tail();
-				return;
-			}
-
-			# If you grew by a piece, you now have to grow less
-			$!growth--;
-
-			return;
-		}
-
-		# If the motion was unsuccessfull, this snake is DEAD!
-		$GAME-OVER = True;
+		# Move
+		self.move();
 	}
 
 	# Insert a new segment at the snake's head
-	method !insert-front( Direction $dir=self.direction ) returns Bool {
+	method !insert-front returns Bool {
+
+		# Get the direction in which to move
+		my $dir = self.direction;
 
 		# Direction Control: the snake can only turn 90 degrees
 		if !self!check-turn($dir) {
@@ -113,8 +103,8 @@ class Snake {
 		# Add new point to the beginning of the Snake
 		self.segments.prepend: $point;
 
-		# Change previous direction to current direction
-		self.direction = $dir;
+		# Check for an intersection with Food
+		self!food-collision;
 
 		# Moving was successfull!
 		return True;
@@ -169,32 +159,56 @@ class Snake {
 		}
 		return False
 	}
+
+	# Collision Detection, but for Food Points
+	method !food-collision {
+
+		# If you collided with Food
+		if @.segments[0].x == $food.position.x && @.segments[0].y == $food.position.y {
+
+			# More points
+			$!score++;
+
+			# More segments
+			$!growth = 1;
+
+			# New Food
+			$food.next;
+		}
+	}
 }
 
 # Food object
 class Food {
-	has $.position;
+	has $.position is rw;
 
+	# Change the food point out for a new one
 	method next {
 		$.position = self!point;
 	}
 
+	# Make a new food poin
 	method new {
-		my $position = self!point;
+		 my $position = self!point;
 		return self.bless(:$position)
 	}
 
+	# Make a new point and make sure it is in the game field and not in the snake!
 	method !point {
 		my $px = $WIDTH.rand.floor;
 		my $py = $HEIGHT.rand.floor;
 
-		say "$py	$px";
-		say "$HEIGHT	$WIDTH";
+		# say "$py	$px";
+		# say "$HEIGHT	$WIDTH";
 
 		# Here's how you can destructure an Object, note that you have to use the field's actual names
 		# and therefore can't also have other vars of the same names
 		for $player1.segments -> Point $P (:$x, :$y) {
-			if $x == $px || $y == $py {
+
+			# If the point is already in the player's segments
+			if $x == $px && $y == $py {
+
+				# Try again
 				return self!point
 			}
 		}
@@ -344,9 +358,10 @@ sub MAIN(Int $height=80, Int $width=10) {
 	game-start;
 
 	# Execution
-	game
+	game;
 
 	# Await game-over Input (Restart or Quit events)
+	game-over;
 }
 
 sub game {
@@ -386,10 +401,12 @@ sub game {
 
 
 	while !$GAME-OVER {}
-
-	game-over;
 }
 
+
+# TODO
+# Refactor so you could extend with multi-player and you aren't using specific vars in global context anymore!
+#  → draw out the codes structure for that (print it first in like 8pt or sth, use 'highlight')
 
 # WHEN I'M DONE WITH THIS
 # I should draw out the structure of this program and see how spaghetti it really
