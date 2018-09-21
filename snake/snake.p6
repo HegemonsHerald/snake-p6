@@ -6,8 +6,8 @@ our $HEIGHT;
 our $WIDTH;
 our $GAME-OVER;
 our $settings;
-our $player1;
-our $food;
+our @PLAYERS;
+our @FOODS;
 
 
 # Class Definitions
@@ -163,17 +163,19 @@ class Snake {
 	# Collision Detection, but for Food Points
 	method !food-collision {
 
-		# If you collided with Food
-		if @.segments[0].x == $food.position.x && @.segments[0].y == $food.position.y {
+		for @FOODS -> $food {
+			# If you collided with Food
+			if @.segments[0].x == $food.position.x && @.segments[0].y == $food.position.y {
 
-			# More points
-			$!score++;
+				# More points
+				$!score++;
 
-			# More segments
-			$!growth = 1;
+				# More segments
+				$!growth = 1;
 
-			# New Food
-			$food.next;
+				# New Food
+				$food.next;
+			}
 		}
 	}
 }
@@ -201,20 +203,23 @@ class Food {
 		# say "$py	$px";
 		# say "$HEIGHT	$WIDTH";
 
-		# Here's how you can destructure an Object, note that you have to use the field's actual names
-		# and therefore can't also have other vars of the same names
-		for $player1.segments -> Point $P (:$x, :$y) {
+		for @PLAYERS -> $player {
 
-			# If the point is already in the player's segments
-			if $x == $px && $y == $py {
+			# Here's how you can destructure an Object, note that you have to use the field's actual names
+			# and therefore can't also have other vars of the same names
+			for $player.segments -> Point $P (:$x, :$y) {
 
-				# Try again
-				return self!point
+				# If the point is already in the player's segments
+				if $x == $px && $y == $py {
+
+					# Try again
+					return self!point
+				}
 			}
-		}
 
-		# And you can use the precendence syntax for method calls whenever you don't have any method chaining going on
-		return Point.new: x => $px, y => $py;
+			# And you can use the precendence syntax for method calls whenever you don't have any method chaining going on
+			return Point.new: x => $px, y => $py;
+		}
 	}
 }
 
@@ -329,7 +334,7 @@ sub game-over {
 # Function to output the current snake segments
 sub say-snake {
 	print "|";
-	for $player1.segments -> $segment {
+	for @PLAYERS[0].segments -> $segment {
 		my $x = $segment.x;
 		my $y = $segment.y;
 		print "$x, $y |";
@@ -366,17 +371,17 @@ sub MAIN(Int $height=80, Int $width=10) {
 
 sub game {
 
-	# Init snake object
-	our $player1 = Snake.create();
+	# Init players
+	our @PLAYERS = [ Snake.create() ];
 
-	# Init food object
-	our $food = Food.new();
+	# Init foods
+	our @FOODS = [ Food.new() ];
 
 	# Kick off rendering
 	render;
 
 	# Init motion timer for player1
-	timer($player1);
+	timer(@PLAYERS[0]);
 
 	# Start reading Keyboard Events for player1
 	my $supplier = Supplier.new;
