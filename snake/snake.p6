@@ -5,7 +5,7 @@ use v6;
 our $HEIGHT;
 our $WIDTH;
 our $GAME-OVER;
-our $settings;
+our $SETTINGS;
 our @PLAYERS;
 our @FOODS;
 
@@ -24,21 +24,30 @@ enum Direction <Up Down Left Right>;
 # Snake object
 class Snake {
 	has @.segments;
-	has $.score is rw = 0;
-	has $.direction is rw = Left;
 	has $.game-over is rw = False;
+	has $.score is rw;
+	has $.direction;
 	has $!growth is rw = 10;
 
 	# Creation shorthand
 	method create {
 
-		# Put the Snake in the screen middle
+		# Put the Snake in the screen middle...
 		my $x = $WIDTH div 2;
 		my $y = $HEIGHT div 2;
+
+		# ... by making its head be in the middle...
 		my $start-point = Point.new(x => $x, y => $y);
+		my @start-points = [ $start-point ];
+
+		# ... then add all the rest of the body
+		loop (my $i = 1; $i < $SETTINGS.start-length; $i++) {
+			my $next-point = Point.new(x => (@start-points[$i - 1].x - 1), y => $y);
+			@start-points.push: $next-point;
+		}
 
 		# Create the Snake!
-		self.new(segments => ($start-point));
+		self.new(segments => @start-points, score => $SETTINGS.start-score, direction => $SETTINGS.start-direction);
 	}
 
 	# Motion Timer
@@ -295,10 +304,16 @@ class Food {
 # Object to hold the settings
 class Settings {
 	has $.high-score;
-	has $.speed;		# speed in moves-per-second
+	has $.start-speed;	# How fast a snake is at the start, in delta seconds between ticks
+	has $.start-score;	# How many points a snake has at the start
+	has $.start-length;	# How long a snake is at the start
+	has $.points-worth;	# How much a food point is worth in score
+	has $.growth-rate;	# How many segments a snake grows per food point
+	has $.start-direction;	# Which direction a snake starts in
 
-	method create ($speed) {
-		self.new(high-score => 0);
+	method create ($start-speed, $start-length, $points-worth, $growth-rate, $start-direction) {
+		self.bless(high-score => 0, start-score => 0, :$start-speed, :$start-length, :$points-worth, :$growth-rate, :$start-direction)
+		# self.new(high-score => 0);
 	}
 }
 
@@ -364,7 +379,9 @@ sub MAIN(Int $height=80, Int $width=10) {
 	our $WIDTH = $width;
 
 	# Init settings object
-	our $settings = Settings.create(0.25);
+	# Note: currently the Snake is initialized with its head on center and the body to its left,
+	# so it can start moving in any direction except left!
+	our $SETTINGS = Settings.create(1, 5, 1, 3, Right);
 	
 	# Init the Ncurses Buffers
 
@@ -385,12 +402,11 @@ sub game {
 	# Init foods
 	our @FOODS = [ Food.new() ];
 
-	# Init timers
-	init-timers;
-
 	# Kick off rendering
 	render;
 
+	# Init timers
+	init-timers;
 
 	# Start reading Keyboard Events for player1
 	my $supplier = Supplier.new;
