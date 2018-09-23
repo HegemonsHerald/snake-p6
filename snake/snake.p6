@@ -27,7 +27,7 @@ class Snake {
 	has $.game-over is rw = False;
 	has $.score is rw;
 	has $.direction;
-	has $!growth is rw = 10;
+	has $.growth = 10;
 
 	# Creation shorthand
 	method create {
@@ -246,10 +246,10 @@ class Snake {
 			if @.segments[0].x == $food.position.x && @.segments[0].y == $food.position.y {
 
 				# More points
-				$!score++;
+				$!score += $SETTINGS.points-worth;
 
 				# More segments
-				$!growth = 1;
+				$!growth += $SETTINGS.growth-rate;
 
 				# New Food
 				$food.next;
@@ -313,7 +313,6 @@ class Settings {
 
 	method create ($start-speed, $start-length, $points-worth, $growth-rate, $start-direction) {
 		self.bless(high-score => 0, start-score => 0, :$start-speed, :$start-length, :$points-worth, :$growth-rate, :$start-direction)
-		# self.new(high-score => 0);
 	}
 }
 
@@ -362,7 +361,7 @@ sub say-snake {
 		my $y = $segment.y;
 		print "$x, $y |";
 	}
-	print "\n";
+	print "		@PLAYERS[0].score()	@PLAYERS[0].growth()\n";
 }
 
 
@@ -436,6 +435,7 @@ sub game {
 
 # TODO
 # make score, growth rate and speed change rate more sensible with delta vars in the settings!
+# make private what can be private
 
 # WHEN I'M DONE WITH THIS
 # I should draw out the structure of this program and see how spaghetti it really
