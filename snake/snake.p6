@@ -169,6 +169,7 @@ class Snake {
 
 		# Compute new position
 		my $point = self!compute-new-point($dir);
+		say $point;
 
 		# Collision Detection: Is it even possible to insert?
 		if self!collision($point) {
@@ -241,18 +242,26 @@ class Snake {
 	# Collision Detection, but for Food Points
 	method !food-collision {
 
-		for @FOODS -> $food {
-			# If you collided with Food
-			if @.segments[0].x == $food.position.x && @.segments[0].y == $food.position.y {
+		# If the game board isn't completely full of Snakes
+		# Note: If the board is full of Snakes the call to $food.next can't decide
+		# on a new Food point and won't return, which means the Game will crash instead
+		# of ending with a Game Over on the next motion by a Snake.
+		unless board-filled() {
 
-				# More points
-				$!score += $SETTINGS.points-worth;
+			# Check for collisions with food objects
+			for @FOODS -> $food {
+				# If you collided with Food
+				if $.segments[0].x == $food.position.x && $.segments[0].y == $food.position.y {
 
-				# More segments
-				$!growth += $SETTINGS.growth-rate;
+					# More points
+					$!score += $SETTINGS.points-worth;
 
-				# New Food
-				$food.next;
+					# More segments
+					$!growth += $SETTINGS.growth-rate;
+
+					# New Food
+					$food.next;
+				}
 			}
 		}
 	}
@@ -351,6 +360,23 @@ sub game-over {
 	say "Game Over";
 }
 
+# Function that checks how many fields of the game board are filled with Snake segments
+# and returns true, if all are filled
+sub board-filled {
+	my $area = $HEIGHT * $WIDTH;
+
+	my $snake-area = 0;
+	for @PLAYERS -> $player {
+		$snake-area += $player.segments.elems;
+	}
+
+	if $snake-area >= $area {
+		return True
+	}
+
+	return False
+}
+
 
 # **** TEMP ****
 # Function to output the current snake segments
@@ -400,6 +426,8 @@ sub game {
 
 	# Init foods
 	our @FOODS = [ Food.new() ];
+	# @FOODS.push: Food.new();
+	say @FOODS;
 
 	# Kick off rendering
 	render;
@@ -408,19 +436,19 @@ sub game {
 	init-timers;
 
 	# Start reading Keyboard Events for player1
-	my $supplier = Supplier.new;
-	my $supply = $supplier.Supply;
-	$supply.tap( -> $v { say "$v" });
+	# my $supplier = Supplier.new;
+	# my $supply = $supplier.Supply;
+	# $supply.tap( -> $v { say "$v" });
 
-	sub key-listener(Supplier $sup) {
-		my $async = Promise.start({
-			loop {
-				$sup.emit(get)
-			}
-		});
-	}
+	# sub key-listener(Supplier $sup) {
+	# 	my $async = Promise.start({
+	# 		loop {
+	# 			$sup.emit(get)
+	# 		}
+	# 	});
+	# }
 
-	key-listener($supplier);
+	# key-listener($supplier);
 
 	# so here's the plan for the key-listener:
 	# listen to all revant keys by default, depending on what context you're in,
@@ -434,8 +462,10 @@ sub game {
 
 
 # TODO
-# make score, growth rate and speed change rate more sensible with delta vars in the settings!
+# test growth and scoring
+# impl and test start speed and speed increase lambda
 # make private what can be private
+# go for the rendering!
 
 # WHEN I'M DONE WITH THIS
 # I should draw out the structure of this program and see how spaghetti it really
