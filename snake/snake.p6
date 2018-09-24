@@ -169,7 +169,6 @@ class Snake {
 
 		# Compute new position
 		my $point = self!compute-new-point($dir);
-		say $point;
 
 		# Collision Detection: Is it even possible to insert?
 		if self!collision($point) {
