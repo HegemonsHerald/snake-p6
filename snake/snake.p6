@@ -88,7 +88,7 @@ class Snake {
 		}
 
 		# Kickoff a first interval, with the default speed
-		change-interval(1);
+		change-interval($SETTINGS.start-speed);
 
 		# Counter, that holds the score of the last speed change
 		my $speed-counter = 0;
@@ -309,15 +309,15 @@ class Food {
 	}
 }
 
-# Object to hold the settings
+# Settings object
 class Settings {
 	has $.high-score;
 	has $.start-speed;	# How fast a snake is at the start, in delta seconds between ticks
 	has $.start-score;	# How many points a snake has at the start
 	has $.start-length;	# How long a snake is at the start
+	has $.start-direction;	# Which direction a snake starts in
 	has $.points-worth;	# How much a food point is worth in score
 	has $.growth-rate;	# How many segments a snake grows per food point
-	has $.start-direction;	# Which direction a snake starts in
 
 	method create ($start-speed, $start-length, $points-worth, $growth-rate, $start-direction) {
 		self.bless(high-score => 0, start-score => 0, :$start-speed, :$start-length, :$points-worth, :$growth-rate, :$start-direction)
@@ -405,7 +405,7 @@ sub MAIN(Int $height=80, Int $width=10) {
 	# Init settings object
 	# Note: currently the Snake is initialized with its head on center and the body to its left,
 	# so it can start moving in any direction except left!
-	our $SETTINGS = Settings.create(1, 5, 1, 3, Right);
+	our $SETTINGS = Settings.create(0.5, 5, 1, 3, Right);
 	
 	# Init the Ncurses Buffers
 
@@ -425,8 +425,6 @@ sub game {
 
 	# Init foods
 	our @FOODS = [ Food.new() ];
-	# @FOODS.push: Food.new();
-	say @FOODS;
 
 	# Kick off rendering
 	render;
