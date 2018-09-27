@@ -8,10 +8,22 @@ use NativeCall;
 sub create-window(Int $height, Int $width, Int $StartY, Int $StartX) {
 	my $win = newwin($height, $width, $StartY, $StartX);
 	# box($win, 0, 0);
-	#my int32 $a = nativecast(uint8, '¦'.encode("utf8"));
-	my int32 $a = nativecast(int32, '|'.encode("utf8"));
-	say nativecast(int32, '|'.encode("ascii"));
-	wborder($win, nativecast(int32, '*'.encode("ascii")), $a, $a, $a, $a, $a, $a, $a);
+	
+	# Using nativecast and encoding to generate the ascii codes on the fly
+	# Make sure a Unicode compatible TERM is set (like xterm-16color)
+	# my int32 $a = nativecast(int32, '|'.encode("ascii"));
+	# my int32 $a = 124;
+
+	# Unicode makes problems
+	# For some reason nativecast produces a number of different output integers, non of which correspond to the looked-for value
+	# my int32 $a = nativecast(int32, 'आ'.encode("utf8"));
+	# my int32 $a = 2309;
+
+	my int32 $a = nativecast(int32, '|'.encode("ascii"));
+	my int32 $b = nativecast(int32, '-'.encode("ascii"));
+	my int32 $c = nativecast(int32, '+'.encode("ascii"));
+
+	wborder($win, $a, $a, $b, $b, $c, $c, $c, $c);
 	wrefresh($win);
 	return $win
 }
