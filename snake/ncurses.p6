@@ -21,7 +21,9 @@ sub create-window(Int $height, Int $width, Int $StartY, Int $StartX) {
 
 	my int32 $a = nativecast(int32, '|'.encode("ascii"));
 	my int32 $b = nativecast(int32, '-'.encode("ascii"));
-	my int32 $c = nativecast(int32, '+'.encode("ascii"));
+	#my int32 $c = nativecast(int32, '+'.encode("ascii"));
+	my int32 $c = 2309;
+	say $c;
 
 	wborder($win, $a, $a, $b, $b, $c, $c, $c, $c);
 	wrefresh($win);
@@ -50,17 +52,19 @@ noecho;		# don't render input
 # Wait for a keypress
 # getch;
 
-my $row = 0;
+my $row = 255;
 loop {
-	my $ch = getch;
-	mvaddch($row, 0, $ch);
+#	my $ch = getch;
+#	mvaddch($row, 0, $ch);
+	hline($row, 12);
 	$row++;
 	nc_refresh;
+	sleep 0.1;
 
-	if $row > 25 {
-		delete-window($status-bar);
-		last;
-	}
+#	if $row > 25 {
+#		delete-window($status-bar);
+#		last;
+#	}
 };
 
 # Cleanup
@@ -68,3 +72,7 @@ LEAVE {
     delwin($win) if $win;
         endwin;
    }
+
+
+# I THINK WE NEED TO RESEARCH MORE ABOUT THE WAY ASCII IS ENCODED
+# I ALSO SOMEHOW HAVE DOUBTS THAT WBORDER TAKES UNICODE AT ALL
