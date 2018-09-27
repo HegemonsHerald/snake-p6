@@ -1,5 +1,6 @@
 use v6;
 use NCurses;
+use NativeCall;
 
 # FUNCTION DEFINITIONS
 
@@ -7,8 +8,10 @@ use NCurses;
 sub create-window(Int $height, Int $width, Int $StartY, Int $StartX) {
 	my $win = newwin($height, $width, $StartY, $StartX);
 	# box($win, 0, 0);
-	my int32 $a = 33;
-	wborder($win, 126, $a, $a, $a, $a, $a, $a, $a);
+	#my int32 $a = nativecast(uint8, '¦'.encode("utf8"));
+	my int32 $a = nativecast(int32, '|'.encode("utf8"));
+	say nativecast(int32, '|'.encode("ascii"));
+	wborder($win, nativecast(int32, '*'.encode("ascii")), $a, $a, $a, $a, $a, $a, $a);
 	wrefresh($win);
 	return $win
 }
