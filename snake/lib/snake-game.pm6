@@ -1,5 +1,14 @@
 unit module snake-game;
 
+our $HEIGHT;
+our $WIDTH;
+our $GAME-OVER;
+our @PLAYERS;
+our @FOODS;
+our $SETTINGS;
+
+
+
 # Class Definitions
 
 # Points for the segments of the snake
@@ -23,21 +32,21 @@ class Snake {
 	method create {
 
 		# Put the Snake in the screen middle...
-		my $x = $*WIDTH div 2;
-		my $y = $*HEIGHT div 2;
+		my $x = $WIDTH div 2;
+		my $y = $HEIGHT div 2;
 
 		# ... by making its head be in the middle...
 		my $start-point = Point.new(x => $x, y => $y);
 		my @start-points = [ $start-point ];
 
 		# ... then add all the rest of the body
-		loop (my $i = 1; $i < $*SETTINGS.start-length; $i++) {
+		loop (my $i = 1; $i < $SETTINGS.start-length; $i++) {
 			my $next-point = Point.new(x => (@start-points[$i - 1].x - 1), y => $y);
 			@start-points.push: $next-point;
 		}
 
 		# Create the Snake!
-		self.new(segments => @start-points, score => $*SETTINGS.start-score, direction => $*SETTINGS.start-direction);
+		self.new(segments => @start-points, score => $SETTINGS.start-score, direction => $SETTINGS.start-direction);
 	}
 
 	# Motion Timer
@@ -78,7 +87,7 @@ class Snake {
 		}
 
 		# Kickoff a first interval, with the default speed
-		change-interval($*SETTINGS.start-speed);
+		change-interval($SETTINGS.start-speed);
 
 		# Counter, that holds the score of the last speed change
 		my $speed-counter = 0;
@@ -87,7 +96,7 @@ class Snake {
 		Promise.start({
 
 			# Only while the game is running
-			while !$*GAME-OVER {
+			while !$GAME-OVER {
 
 				# If the score has increased by 5
 				if $speed-counter <= ($.score - 5) {
@@ -101,7 +110,7 @@ class Snake {
 			}
 
 			# If the Game has ended
-			if $*GAME-OVER {
+			if $GAME-OVER {
 
 				# Quit the interval, just to be sure... the supply and supplier go out of scope here anyways
 				$meta-supplier.done;
@@ -130,7 +139,7 @@ class Snake {
 		}
 
 		# If the motion was unsuccessfull, this snake is DEAD!
-		$*GAME-OVER = True;
+		$GAME-OVER = True;
 	}
 
 	# Move in a specific direction
@@ -197,12 +206,12 @@ class Snake {
 				$y--;
 				# TODO I don't know, whether ncurses screens are zero-indexed or one-indexed
 				if $y == 0 {
-					$y = $*HEIGHT;
+					$y = $HEIGHT;
 				}
 			}
-			when Down { $y++; if $y == $*HEIGHT { $y=0 } }
-			when Right { $x++; if $x == $*WIDTH { $x=0 } }
-			when Left { $x--; if $x == 0 { $x=$*WIDTH } }
+			when Down { $y++; if $y == $HEIGHT { $y=0 } }
+			when Right { $x++; if $x == $WIDTH { $x=0 } }
+			when Left { $x--; if $x == 0 { $x=$WIDTH } }
 		}
 
 		# Return the new head's point
@@ -238,15 +247,15 @@ class Snake {
 		unless board-filled() {
 
 			# Check for collisions with food objects
-			for @*FOODS -> $food {
+			for @FOODS -> $food {
 				# If you collided with Food
 				if $.segments[0].x == $food.position.x && $.segments[0].y == $food.position.y {
 
 					# More points
-					$!score += $*SETTINGS.points-worth;
+					$!score += $SETTINGS.points-worth;
 
 					# More segments
-					$!growth += $*SETTINGS.growth-rate;
+					$!growth += $SETTINGS.growth-rate;
 
 					# New Food
 					$food.next;
@@ -273,13 +282,13 @@ class Food {
 
 	# Make a new point and make sure it is in the game field and not in the snake!
 	method !point {
-		my $px = $*WIDTH.rand.floor;
-		my $py = $*HEIGHT.rand.floor;
+		my $px = $WIDTH.rand.floor;
+		my $py = $HEIGHT.rand.floor;
 
 		# say "$py	$px";
-		# say "$*HEIGHT	$*WIDTH";
+		# say "$HEIGHT	$WIDTH";
 
-		for @*PLAYERS -> $player {
+		for @PLAYERS -> $player {
 
 			# Here's how you can destructure an Object, note that you have to use the field's actual names
 			# and therefore can't also have other vars of the same names
@@ -319,14 +328,14 @@ class Settings {
 
 # Make the Snake(s) move
 sub init-timers {
-	for @*PLAYERS -> $player {
+	for @PLAYERS -> $player {
 		$player.timer
 	}
 }
 
 # Render Function
 sub render {
-	unless $*GAME-OVER {
+	unless $GAME-OVER {
 		say-snake
 	}
 
@@ -343,10 +352,10 @@ sub render {
 # Function that checks how many fields of the game board are filled with Snake segments
 # and returns true, if all are filled
 sub board-filled {
-	my $area = $*HEIGHT * $*WIDTH;
+	my $area = $HEIGHT * $WIDTH;
 
 	my $snake-area = 0;
-	for @*PLAYERS -> $player {
+	for @PLAYERS -> $player {
 		$snake-area += $player.segments.elems;
 	}
 
@@ -360,12 +369,12 @@ sub board-filled {
 # Function to output the current snake segments
 sub say-snake {
 	print "|";
-	for @*PLAYERS[0].segments -> $segment {
+	for @PLAYERS[0].segments -> $segment {
 		my $x = $segment.x;
 		my $y = $segment.y;
 		print "$x, $y |";
 	}
-	print "		@*PLAYERS[0].score()	@*PLAYERS[0].growth()\n";
+	print "		@PLAYERS[0].score()	@PLAYERS[0].growth()\n";
 }
 
 
@@ -374,13 +383,13 @@ sub say-snake {
 sub start-up (Int $height, Int $width, $speed, $length, $worth, $growth, $start-direction) is export {
 
 	# init thingies
-	our $*HEIGHT	= $height;
-	our $*WIDTH	= $width;
-	our $*GAME-OVER;
-	our $*PLAYERS;
-	our $*FOODS;
+	our $HEIGHT	= $height;
+	our $WIDTH	= $width;
+	our $GAME-OVER;
+	our @PLAYERS;
+	our @FOODS;
 
-	our $*SETTINGS	= Settings.create($speed, $length, $worth, $growth, $start-direction);
+	our $SETTINGS	= Settings.create($speed, $length, $worth, $growth, $start-direction);
 
 	# run the game!
 	game-start;
@@ -395,7 +404,15 @@ sub game-start is export {
 }
 
 sub game is export {
+
 	# game...
+	our @PLAYERS = [ Snake.create() ];
+
+	our @FOODS = [ Food.new() ];
+
+	init-timers;
+
+	while !$GAME-OVER {}
 }
 
 sub game-over is export {
