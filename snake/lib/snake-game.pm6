@@ -13,6 +13,8 @@ our $SETTINGS;
 our @WINDOWS;
 
 
+# *****************************************************************************
+# GAME LOGIC
 
 # Class Definitions
 
@@ -368,55 +370,62 @@ sub say-snake {
 
 
 # *****************************************************************************
-# Render Function Wrappers
-
-# Render Function
-#sub render {
-#	unless $GAME-OVER {
-#		say-snake
-#	}
-#
-#	# Note: the *GAME-OVER check here is necessary, cause the check
-#	# in the timer sub sometimes gets the timing wrong and makes a
-#	# recursive call, even though *GAME-OVER over is set within a
-#	# millisecond or so. In that case another render is kicked off
-#	# that may interfere with the game-over() subroutine, unless I
-#	# check for *GAME-OVER at every position a render update is
-#	# made!
-#}
+# Game State Functions and API Functions
 
 
+# Render Function Wrapper
+sub render {
+	unless $GAME-OVER {
+		snake-ui::render(@WINDOWS);
+	}
 
-# *****************************************************************************
-# API Functions
+	# Note: the *GAME-OVER check here is necessary, cause the check
+	# in the timer sub sometimes gets the timing wrong and makes a
+	# recursive call, even though *GAME-OVER over is set within a
+	# millisecond or so. In that case another render is kicked off
+	# that may interfere with the game-over() subroutine, unless I
+	# check for *GAME-OVER at every position a render update is
+	# made!
+}
 
+# Start the Game
 sub game-start is export {
 
+	# Render the initial screen
 	welcome-screen(@WINDOWS);
 
 }
 
+# Run the Game
 sub game is export {
 
-	# game...
+	# Setup Game Logic things...
 	our @PLAYERS.push: Snake.create();
-
 	our @FOODS.push: Food.new();
 
+	# Start the motions!
 	init-timers;
 
-	while !$GAME-OVER {}
+	# While the Game's running
+	while !$GAME-OVER {
+
+		# Wait for input
+
+	}
 }
 
+# On Game Over
 sub game-over is export {
-	say "Game Over";
 
-	# render the game over screen over the active screen...
+	# Render the game over screen
+	game-over-screen(@WINDOWS);
+
 }
 
+# Kickoff!
 sub start-up (Int $height, Int $width, $speed, $length, $worth, $growth, $start-direction) is export {
 
-	# init thingies
+	# Init thingies
 	our $ABS-HEIGHT	= $height;		# absolute height
 	our $ABS-WIDTH	= $width;		# absolute width
 	our $HEIGHT	= $ABS-HEIGHT - 2;	# height of the game board
@@ -434,13 +443,14 @@ sub start-up (Int $height, Int $width, $speed, $length, $worth, $growth, $start-
 	@WINDOWS.push: ui-init;
 
 	# These have to be globally scoped for the execution of the entire game...
+	curs_set(0);
 	start_color;
 	use_default_colors;
 	init_pair(COLOR_PAIR_1, COLOR_BLUE, COLOR_YELLOW);
 	init_pair(COLOR_PAIR_2, COLOR_BLUE, -1);
 
 	# Let's make some windows...
-	#			  height	   width       y		x
+	# ...			  height	   width       y		x
 	@WINDOWS.push: Window.new(1		 , $ABS-WIDTH, 0,		0);	# ... top bar
 	@WINDOWS.push: Window.new($ABS-HEIGHT - 2, $ABS-WIDTH, 1,		0);	# ... game board
 	@WINDOWS.push: Window.new(1		 , $ABS-WIDTH, $ABS-HEIGHT - 1, 0);	# ... bottom bar

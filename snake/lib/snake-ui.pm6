@@ -21,6 +21,17 @@ sub ui-init is export {
         return $window
 }
 
+# Run bkgd() on all the relevant windows
+sub postfix:<.bkgd>(@w) {
+	for @w[1..^@w] { $_.bkgd }
+}
+
+# Run refresh on all the relevant windows
+sub postfix:<.refresh>(@w) {
+	for @w[1..^@w] { $_.refresh }
+	nc_refresh
+}
+
 # Window objects hold meta data about the windows, so you can remember e.g. the width
 class Window is export {
 	has $.width;
@@ -78,25 +89,11 @@ class Window is export {
 	}
 }
 
-# Run bkgd() on all the relevant windows
-sub postfix:<.bkgd>(@w) {
-	for @w[1..^@w] { $_.bkgd }
-}
-
-# Run refresh on all the relevant windows
-sub postfix:<.refresh>(@w) {
-	for @w[1..^@w] { $_.refresh }
-	nc_refresh
-}
-
 # Render Initial Welcome Screen
 sub welcome-screen (@windows) is export {
 
 	# Shortcuts
-        my $top = @windows[1];
-        my $mid = @windows[2];
-        my $bot = @windows[3];
-
+	my ($top, $mid, $bot) = @windows[1..3];
 
 	# Set the color palette...
 	$top.color(COLOR_PAIR_1);
@@ -120,11 +117,24 @@ sub welcome-screen (@windows) is export {
 
 	move(0,0);
 
+	# Wait for Input
 	loop {}
 }
 
 # General Render Function
-sub render is export {}
+our sub render (@windows) {
+
+	# Render Game
+	# ...
+
+}
 
 # Render Game Over Screen
-#sub game-over is export {}
+sub game-over-screen (@windows) is export {
+
+	# Render Game Over Screen
+	# ...
+
+	# Wait for input
+
+}
