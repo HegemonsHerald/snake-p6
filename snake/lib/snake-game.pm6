@@ -417,8 +417,12 @@ sub game-over is export {
 sub start-up (Int $height, Int $width, $speed, $length, $worth, $growth, $start-direction) is export {
 
 	# init thingies
-	our $HEIGHT	= $height;
-	our $WIDTH	= $width;
+	our $ABS-HEIGHT	= $height;		# absolute height
+	our $ABS-WIDTH	= $width;		# absolute width
+	our $HEIGHT	= $ABS-HEIGHT - 2;	# height of the game board
+	our $WIDTH	= $ABS-WIDTH;		# width of the game board
+	our $H-OFFSET	= 1;			# offset for the renderer: add this to all game element's Y-position-values to offset against the borders...
+	our $W-OFFSET	= 0;			# offset for the renderer: add this to all game element's X-position-values to offset against the borders...
 	our @PLAYERS	= [];
 	our @FOODS	= [];
 	our @WINDOWS	= [];
@@ -433,12 +437,13 @@ sub start-up (Int $height, Int $width, $speed, $length, $worth, $growth, $start-
 	start_color;
 	use_default_colors;
 	init_pair(COLOR_PAIR_1, COLOR_BLUE, COLOR_YELLOW);
-	init_pair(COLOR_PAIR_2, COLOR_GREEN, COLOR_WHITE);
+	init_pair(COLOR_PAIR_2, COLOR_BLUE, -1);
 
-	# Let's make some windows...		height		width	y		x
-	@WINDOWS.push: snake-ui::create-window( 1,		$WIDTH, 0, 		0);	# ... top bar
-	@WINDOWS.push: snake-ui::create-window( $HEIGHT - 2,	$WIDTH, 1, 		0);	# ... game board
-	@WINDOWS.push: snake-ui::create-window( 1,		$WIDTH, $HEIGHT - 1,	0);	# ... bottom bar
+	# Let's make some windows...
+	#			  height	   width       y		x
+	@WINDOWS.push: Window.new(1		 , $ABS-WIDTH, 0,		0);	# ... top bar
+	@WINDOWS.push: Window.new($ABS-HEIGHT - 2, $ABS-WIDTH, 1,		0);	# ... game board
+	@WINDOWS.push: Window.new(1		 , $ABS-WIDTH, $ABS-HEIGHT - 1, 0);	# ... bottom bar
 	
 
 	# run the game!

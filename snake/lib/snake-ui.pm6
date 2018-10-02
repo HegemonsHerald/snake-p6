@@ -21,81 +21,104 @@ sub ui-init is export {
         return $window
 }
 
-# Set my Color Palette
-sub init-colors {
-        start_color;
-        use_default_colors;
-        init_pair( COLOR_PAIR_1, COLOR_BLUE, -1 );
-}
-
-class Window {
+# Window objects hold meta data about the windows, so you can remember e.g. the width
+class Window is export {
 	has $.width;
 	has $.height;
 	has $.x;
 	has $.y;
 	has $.window;
 
-	method new ($height, $width, $y, $x, $window) {
+	# Make a new window
+	method new ($height, $width, $y, $x) {
+
+		# Create the window
+		my $window = newwin($height, $width, $y, $x);
+
+		# Render it
+		wrefresh($window);
+		nc_refresh;
+
+		# Return the window object
 		return self.bless(:$height, :$width, :$y, :$x, :$window)
 	}
-}
 
-# Create Window
-our sub create-window (Int $height, Int $width, Int $pos-y, Int $pos-x) {
-        my $win = newwin($height, $width, $pos-y, $pos-x);
+	# Fill the window with spaces to set the background color!
+	multi method bkgd {
+		for 0..$.height -> $index {
+			mvwhline($.window, $index, $.x, 32, $.width)
+		}
+	}
 
-        wrefresh($win);
-	nc_refresh;
+	multi method bkgd ($color-pair) {
+		wcolor_set($.window, $color-pair, 0);
+		$.bkgd;
+	}
 
-	my $window-container = Window.new($height, $width, $pos-y, $pos-x, $win);
-        return $window-container
-}
+	# Delete the window
+	method delwin {
+		delwin($.window);
+		nc_refresh;
+	}
 
-# Delete Window
-sub delete-window ($window) {
-        delwin($window);
-        nc_refresh;
-}
+	method mvprintw ($y, $x, $str) {
+		mvwprintw($.window, $y, $x, $str)
+	}
 
+	method color ($color-pair) {
+		wcolor_set($.window, $color-pair, 0);
+	}
 
-# Fill window with spaces to draw the background color!
-sub draw-bg ($window) {
-	my $win = $window.window;
-	for 0..$window.height -> $index {
-		mvwhline($win, $index, $window.x, 32, $window.width)
+	method attron ($attr) {
+		wattron($.window, $attr)
+	}
+
+	method refresh {
+		wrefresh($.window)
 	}
 }
 
+# Run bkgd() on all the relevant windows
+sub postfix:<.bkgd>(@w) {
+	for @w[1..^@w] { $_.bkgd }
+}
+
+# Run refresh on all the relevant windows
+sub postfix:<.refresh>(@w) {
+	for @w[1..^@w] { $_.refresh }
+	nc_refresh
+}
 
 # Render Initial Welcome Screen
 sub welcome-screen (@windows) is export {
+
+	# Shortcuts
         my $top = @windows[1];
         my $mid = @windows[2];
         my $bot = @windows[3];
-	my $tw = $top.window;
-	my $mw = $mid.window;
-	my $bm = $bot.window;
 
-	# make the windows visible...
 
-	wcolor_set(	$tw, COLOR_PAIR_2, 0);
-	wcolor_set(	$mw, COLOR_PAIR_1, 0);
-	wcolor_set(	$bm, COLOR_PAIR_2, 0);
-	wattron(	$tw, A_REVERSE);
-	wattron(	$bm, A_REVERSE);
-	draw-bg($top);
-	draw-bg($mid);
-	draw-bg($bot);
-	mvwprintw(	$mw, 5, 5, "wheee ƣ");
+	# Set the color palette...
+	$top.color(COLOR_PAIR_1);
+	$mid.color(COLOR_PAIR_2);
+	$bot.color(COLOR_PAIR_1);
 
-	my $top-str = "SNAKE!";
-	mvwprintw(	$tw, 0, 0, $top-str);
-	mvwprintw(	$bm, 0, 0, "asdfghjkl;asdfghjkl;asdfghjkl;asdfgh");
-	wrefresh($mw);
-	wrefresh($tw);
-	wrefresh($bm);
+	# ... and styles
+	$top.attron(A_BOLD);
+	$bot.attron(A_BOLD);
+
+	# Make the windows visible
+	@windows.bkgd;
+
+	# Add some Text
+	$top.mvprintw(0, 0, "SNAKE!");
+	$mid.mvprintw(5, 5, "wheee ƣ");
+	$bot.mvprintw(0, 0, "Hahahahahahahahahahaha");
+
+	# Refresh
+	@windows.refresh;
+
 	move(0,0);
-	nc_refresh;
 
 	loop {}
 }
