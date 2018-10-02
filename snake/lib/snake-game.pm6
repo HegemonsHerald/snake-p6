@@ -1,11 +1,16 @@
 unit module snake-game;
 
+use snake-ui;
+use NCurses;
+use NativeCall;
+
 our $HEIGHT;
 our $WIDTH;
 our $GAME-OVER;
 our @PLAYERS;
 our @FOODS;
 our $SETTINGS;
+our @WINDOWS;
 
 
 
@@ -276,7 +281,7 @@ class Food {
 
 	# Make a new food poin
 	method new {
-		 my $position = self!point;
+		my $position = self!point;
 		return self.bless(:$position)
 	}
 
@@ -333,22 +338,6 @@ sub init-timers {
 	}
 }
 
-# Render Function
-sub render {
-	unless $GAME-OVER {
-		say-snake
-	}
-
-	# Note: the *GAME-OVER check here is necessary, cause the check
-	# in the timer sub sometimes gets the timing wrong and makes a
-	# recursive call, even though *GAME-OVER over is set within a
-	# millisecond or so. In that case another render is kicked off
-	# that may interfere with the game-over() subroutine, unless I
-	# check for *GAME-OVER at every position a render update is
-	# made!
-}
-
-
 # Function that checks how many fields of the game board are filled with Snake segments
 # and returns true, if all are filled
 sub board-filled {
@@ -378,37 +367,41 @@ sub say-snake {
 }
 
 
+# *****************************************************************************
+# Render Function Wrappers
+
+# Render Function
+#sub render {
+#	unless $GAME-OVER {
+#		say-snake
+#	}
+#
+#	# Note: the *GAME-OVER check here is necessary, cause the check
+#	# in the timer sub sometimes gets the timing wrong and makes a
+#	# recursive call, even though *GAME-OVER over is set within a
+#	# millisecond or so. In that case another render is kicked off
+#	# that may interfere with the game-over() subroutine, unless I
+#	# check for *GAME-OVER at every position a render update is
+#	# made!
+#}
 
 
-sub start-up (Int $height, Int $width, $speed, $length, $worth, $growth, $start-direction) is export {
 
-	# init thingies
-	our $HEIGHT	= $height;
-	our $WIDTH	= $width;
-	our $GAME-OVER;
-	our @PLAYERS;
-	our @FOODS;
-
-	our $SETTINGS	= Settings.create($speed, $length, $worth, $growth, $start-direction);
-
-	# run the game!
-	game-start;
-	game;
-	game-over;
-}
+# *****************************************************************************
+# API Functions
 
 sub game-start is export {
-	say "SNAKE! To play please press any button";
 
-	# render the welcome screen
+	welcome-screen(@WINDOWS);
+
 }
 
 sub game is export {
 
 	# game...
-	our @PLAYERS = [ Snake.create() ];
+	our @PLAYERS.push: Snake.create();
 
-	our @FOODS = [ Food.new() ];
+	our @FOODS.push: Food.new();
 
 	init-timers;
 
@@ -420,3 +413,37 @@ sub game-over is export {
 
 	# render the game over screen over the active screen...
 }
+
+sub start-up (Int $height, Int $width, $speed, $length, $worth, $growth, $start-direction) is export {
+
+	# init thingies
+	our $HEIGHT	= $height;
+	our $WIDTH	= $width;
+	our @PLAYERS	= [];
+	our @FOODS	= [];
+	our @WINDOWS	= [];
+
+	our $SETTINGS	= Settings.create($speed, $length, $worth, $growth, $start-direction);
+
+
+	# Basic Settings and init stdscr
+	@WINDOWS.push: ui-init;
+
+	# These have to be globally scoped for the execution of the entire game...
+	start_color;
+	use_default_colors;
+	init_pair(COLOR_PAIR_1, COLOR_BLUE, COLOR_YELLOW);
+	init_pair(COLOR_PAIR_2, COLOR_GREEN, COLOR_WHITE);
+
+	# Let's make some windows...		height		width	y		x
+	@WINDOWS.push: snake-ui::create-window( 1,		$WIDTH, 0, 		0);	# ... top bar
+	@WINDOWS.push: snake-ui::create-window( $HEIGHT - 2,	$WIDTH, 1, 		0);	# ... game board
+	@WINDOWS.push: snake-ui::create-window( 1,		$WIDTH, $HEIGHT - 1,	0);	# ... bottom bar
+	
+
+	# run the game!
+	game-start;
+	game;
+	game-over;
+}
+

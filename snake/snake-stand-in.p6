@@ -29,7 +29,7 @@ use snake-game;
 #
 # from snake-game.p6 call snake-ui::render, which takes DYNAMICALLY scoped global player and food and size and settings vars...!
 
-sub MAIN(Int $height=80, Int $width=10) {
+sub MAIN(Int $height=10, Int $width=40) {
 
 	start-up($height, $width, 0.5, 5, 1, 3, Right)
 
