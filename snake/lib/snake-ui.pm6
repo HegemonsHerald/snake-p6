@@ -21,15 +21,25 @@ sub ui-init is export {
         return $window
 }
 
-# Run bkgd() on all the relevant windows
-sub postfix:<.bkgd>(@w) {
-	for @w[1..^@w] { $_.bkgd }
+# Run a method on all the windows
+sub infix:<all>(@w, $m) {
+	for @w[1..^@w.elems] { $_."$m"() }
+	# Note: this makes use of the quoted method call syntax, which allows you to substitute the method name from inside a variable!
+	# This is friggin' brilliant [perl 5 can do that, too!]
 }
 
-# Run refresh on all the relevant windows
-sub postfix:<.refresh>(@w) {
-	for @w[1..^@w] { $_.refresh }
-	nc_refresh
+# Fields in the top bar and the bottom bar
+class Field {
+	has $.x-anchor;
+	has $.y-anchor;
+
+	method new ($y-anchor, $x-anchor) {
+		self.bless(:$y-anchor, :$x-anchor)
+	}
+
+	method move-to {
+		move($.y-anchor, $.x-anchor);
+	}
 }
 
 # Window objects hold meta data about the windows, so you can remember e.g. the width
@@ -89,6 +99,40 @@ class Window is export {
 	}
 }
 
+# Top Window
+class Top is Window is export {
+	#has Field $.l-field;
+	#has Field $.r-field;
+	has $.snake-field;
+	has $.snake-message;
+	has $.hi-score-field;
+
+	# This code also works: it slurps up the parameters...
+	# method new (*%params) {
+	# 	# ... and transforms them into a list with '|'
+	# 	return self.bless(|%params);
+	# }
+
+	method new ($height, $width, $y, $x, $snake-message, $max-score) {
+
+
+		# Create the window
+		my $window = newwin($height, $width, $y, $x);
+
+		# Render it
+		wrefresh($window);
+		nc_refresh;
+
+		my $snake-field = Field.new(0,0);
+
+		my $hi-score-field = Field.new(0, $max-score.elems);
+
+		return self.bless(:$height, :$width, :$y, :$x, :$window, :$snake-message, :$snake-field, :$hi-score-field)
+	}
+}
+
+
+
 # Render Initial Welcome Screen
 sub welcome-screen (@windows) is export {
 
@@ -105,15 +149,15 @@ sub welcome-screen (@windows) is export {
 	$bot.attron(A_BOLD);
 
 	# Make the windows visible
-	@windows.bkgd;
+	@windows all "bkgd";
 
 	# Add some Text
 	$top.mvprintw(0, 0, "SNAKE!");
 	$mid.mvprintw(5, 5, "wheee ƣ");
-	$bot.mvprintw(0, 0, "Hahahahahahahahahahaha");
+	$bot.mvprintw(0, 0, "sldkfjsdlfkj");
 
 	# Refresh
-	@windows.refresh;
+	@windows all "refresh";
 
 	move(0,0);
 

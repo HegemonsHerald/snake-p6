@@ -331,6 +331,7 @@ class Settings {
 }
 
 
+# *****************************************************************************
 # Function Definitions
 
 # Make the Snake(s) move
@@ -368,6 +369,10 @@ sub say-snake {
 	print "		@PLAYERS[0].score()	@PLAYERS[0].growth()\n";
 }
 
+# Function to calculate the maximally possible score
+sub max-score {
+	return ( $HEIGHT * $WIDTH - $SETTINGS.start-length ) * $SETTINGS.points-worth
+}
 
 # *****************************************************************************
 # Game State Functions and API Functions
@@ -450,11 +455,10 @@ sub start-up (Int $height, Int $width, $speed, $length, $worth, $growth, $start-
 	init_pair(COLOR_PAIR_2, COLOR_BLUE, -1);
 
 	# Let's make some windows...
-	# ...			  height	   width       y		x
-	@WINDOWS.push: Window.new(1		 , $ABS-WIDTH, 0,		0);	# ... top bar
-	@WINDOWS.push: Window.new($ABS-HEIGHT - 2, $ABS-WIDTH, 1,		0);	# ... game board
-	@WINDOWS.push: Window.new(1		 , $ABS-WIDTH, $ABS-HEIGHT - 1, 0);	# ... bottom bar
-	
+	# ...			  	height	   		width       	y			x
+	@WINDOWS.push: Top.new(		1,			$ABS-WIDTH,	0,			0,	"SNAKE!!!",	max-score.perl);	# ... top bar
+	@WINDOWS.push: Window.new(	$ABS-HEIGHT - 2,	$ABS-WIDTH,	1,			0);					# ... game board
+	@WINDOWS.push: Window.new(	1,			$ABS-WIDTH,	$ABS-HEIGHT - 1,	0);					# ... bottom bar
 
 	# run the game!
 	game-start;
