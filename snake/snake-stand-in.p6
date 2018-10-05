@@ -29,7 +29,7 @@ use snake-game;
 #
 # from snake-game.p6 call snake-ui::render, which takes DYNAMICALLY scoped global player and food and size and settings vars...!
 
-sub MAIN(Int $height=10, Int $width=40) {
+sub MAIN(Int $height=0, Int $width=0) {
 
 	start-up($height, $width, 0.5, 5, 1, 3, Right)
 
@@ -39,3 +39,6 @@ sub MAIN(Int $height=10, Int $width=40) {
 # Potential Multi-Player:
 # Put the Message-Generation Logic for High-Score and the Player-Score Displays in the players themselves, have the players have an ID or a name...
 # Then you can go: player 3:  SCORE | player 2: SCORE etc
+
+# 1. standard size is window size
+# 2. min size is five-by-five, in which case the snake is reduced to a length of one

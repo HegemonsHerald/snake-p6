@@ -185,7 +185,7 @@ class Top is Window is export {
 		my $string = self.high-score-field.make-string(self.width, $.message, $high-score);
 
 		# Print the field
-		self.move($.high-score-field.y-anchor, $.hi-score-field.x-anchor);
+		self.move($.high-score-field.y-anchor, $.high-score-field.x-anchor);
 		self.wprintw($string);
 	}
 }

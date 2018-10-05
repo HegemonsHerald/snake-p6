@@ -430,21 +430,8 @@ sub game-over is export {
 # Kickoff!
 sub start-up (Int $height, Int $width, $speed, $length, $worth, $growth, $start-direction) is export {
 
-	# Init thingies
-	our $ABS-HEIGHT	= $height;		# absolute height
-	our $ABS-WIDTH	= $width;		# absolute width
-	our $HEIGHT	= $ABS-HEIGHT - 2;	# height of the game board
-	our $WIDTH	= $ABS-WIDTH;		# width of the game board
-	our $H-OFFSET	= 1;			# offset for the renderer: add this to all game element's Y-position-values to offset against the borders...
-	our $W-OFFSET	= 0;			# offset for the renderer: add this to all game element's X-position-values to offset against the borders...
-	our @PLAYERS	= [];
-	our @FOODS	= [];
+	# Init NCurses
 	our @WINDOWS	= [];
-
-	our $SETTINGS	= Settings.create($speed, $length, $worth, $growth, $start-direction);
-
-
-	# Basic Settings and init stdscr
 	@WINDOWS.push: ui-init;
 
 	# These have to be globally scoped for the execution of the entire game...
@@ -453,6 +440,31 @@ sub start-up (Int $height, Int $width, $speed, $length, $worth, $growth, $start-
 	use_default_colors;
 	init_pair(COLOR_PAIR_1, COLOR_BLUE, COLOR_YELLOW);
 	init_pair(COLOR_PAIR_2, COLOR_BLUE, -1);
+
+	# Make window size decisions
+	my ($h, $w) = $height, $width;
+	my $y = getmaxy(@WINDOWS[0]);
+	my $x = getmaxx(@WINDOWS[0]);
+	
+	if $height == 0 {
+		$h = $y;
+	}
+
+	if $width == 0 {
+		$w = $x;
+	}
+
+	# Init thingies
+	our $ABS-HEIGHT	= $h;			# absolute height
+	our $ABS-WIDTH	= $w;			# absolute width
+	our $HEIGHT	= $ABS-HEIGHT - 2;	# height of the game board
+	our $WIDTH	= $ABS-WIDTH;		# width of the game board
+	our $H-OFFSET	= 1;			# offset for the renderer: add this to all game element's Y-position-values to offset against the borders...
+	our $W-OFFSET	= 0;			# offset for the renderer: add this to all game element's X-position-values to offset against the borders...
+	our @PLAYERS	= [];
+	our @FOODS	= [];
+
+	our $SETTINGS	= Settings.create($speed, $length, $worth, $growth, $start-direction);
 
 	# Let's make some windows...
 	# ...			  	height	   		width       	y			x
