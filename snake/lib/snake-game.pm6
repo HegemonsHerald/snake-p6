@@ -458,7 +458,7 @@ sub start-up (Int $height, Int $width, $speed, $length, $worth, $growth, $start-
 	# ...			  	height	   		width       	y			x
 	@WINDOWS.push: Top.new(		1,			$ABS-WIDTH,	0,			0,	"SNAKE!!!",	max-score);	# ... top bar
 	@WINDOWS.push: Window.new(	$ABS-HEIGHT - 2,	$ABS-WIDTH,	1,			0);					# ... game board
-	@WINDOWS.push: Window.new(	1,			$ABS-WIDTH,	$ABS-HEIGHT - 1,	0);					# ... bottom bar
+	@WINDOWS.push: Bottom.new(	1,			$ABS-WIDTH,	$ABS-HEIGHT - 1,	0,	max-score);			# ... bottom bar
 
 	# run the game!
 	game-start;

@@ -182,7 +182,7 @@ class Top is Window is export {
 }
 
 # Bottom Window
-class Bottom is Window {
+class Bottom is Window is export {
 	has Field $.score-field;
 
 	method new ($height, $width, $y, $x, $max-score) {
