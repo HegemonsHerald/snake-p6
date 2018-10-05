@@ -53,6 +53,21 @@ class Score-Field is Field {
 
 		self.bless(:$y-anchor, :$x-anchor);
 	}
+
+	# Method to calculate a message string
+	method make-string ($parent-width, $message, $score) {
+
+		# Compute the string for the field
+		my $string = $message;
+
+		my $number-of-spaces = $parent-width - self.x-anchor - $message.chars - $score.base(10).chars;
+
+		for 1..$number-of-spaces { $string = $string ~ " " }
+
+		$string = $string ~ $score.base(10);
+
+		return $string
+	}
 }
 
 # Window objects hold meta data about the windows, so you can remember e.g. the width
@@ -132,7 +147,8 @@ class Window is export {
 class Top is Window is export {
 	has Field $.snake-field;
 	has $.snake-message;
-	has Field $.hi-score-field;
+	has Field $.high-score-field;
+	has $.message;
 
 	# This code also works: it slurps up the parameters...
 	# method new (*%params) {
@@ -150,10 +166,10 @@ class Top is Window is export {
 
 		# Now for the right side, bright side!
 		my $message = "Hi:";
-		my $hi-score-field = Score-Field.new(0, $width, $max-score, $message.chars);
+		my $high-score-field = Score-Field.new(0, $width, $max-score, $message.chars);
 
 		# Maaaake Snaaaake Tooooop Windoooooooow
-		return self.bless(:$height, :$width, :$y, :$x, :$window, :$snake-message, :$snake-field, :$hi-score-field)
+		return self.bless(:$height, :$width, :$y, :$x, :$window, :$snake-message, :$snake-field, :$high-score-field, :$message)
 	}
 
 	# Print the Message on the Left Side of the Top Window
@@ -163,27 +179,21 @@ class Top is Window is export {
 	}
 
 	# Print the Message on the Right Side of the Top Window... that's the High Score
-	method print-hi-score-field ($high-score) {
+	method print-high-score-field ($high-score) {
 
-		# Compute the string for the field
-
-		my $message = "HI:";
-		my $number-of-spaces = self.width - self.hi-score-field.x-anchor - $message.chars - $high-score.base(10).chars;
-
-		for 1..$number-of-spaces { $message = $message ~ " " }
-
-		$message = $message ~ $high-score.base(10);
+		# Make the Field's contents
+		my $string = self.high-score-field.make-string(self.width, $.message, $high-score);
 
 		# Print the field
-
-		self.move($.hi-score-field.y-anchor, $.hi-score-field.x-anchor);
-		self.wprintw($message);
+		self.move($.high-score-field.y-anchor, $.hi-score-field.x-anchor);
+		self.wprintw($string);
 	}
 }
 
 # Bottom Window
 class Bottom is Window is export {
-	has Field $.score-field;
+	has Score-Field $.score-field;
+	has $.message;
 
 	method new ($height, $width, $y, $x, $max-score) {
 
@@ -195,10 +205,17 @@ class Bottom is Window is export {
 		my $score-field = Score-Field.new(0, $width, $max-score, $message.chars);
 
 		# Maaaake Snaaaake Bottooooom Windoooooooow
-		return self.bless(:$height, :$width, :$y, :$x, :$window, :$score-field)
+		return self.bless(:$height, :$width, :$y, :$x, :$window, :$score-field, :$message)
 	}
 
 	method print-score-field ($score) {
+
+		# Make the Field's contents
+		my $string = self.score-field.make-string(self.width, $.message, $score);
+
+		# Print the field
+		self.move($.score-field.y-anchor, $.score-field.x-anchor);
+		self.wprintw($string);
 	}
 }
 
@@ -228,7 +245,7 @@ sub welcome-screen (@windows, $high-score) is export {
 
 	# Print the Top Bar
 	$top.print-snake-field;
-	$top.print-hi-score-field($high-score);
+	$top.print-high-score-field($high-score);
 
 	# Print the Startup Screen
 
@@ -260,7 +277,7 @@ sub game-over-screen (@windows, $high-score) is export {
 	# Render Game Over Screen
 	# ...
 
-	$top.print-hi-score-field($high-score);
+	$top.print-high-score-field($high-score);
 
 
 	# Wait for input
