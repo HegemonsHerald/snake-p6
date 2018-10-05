@@ -4,7 +4,11 @@ use NativeCall;
 
 unit module snake-ui;
 
+# setlocale from libc, sets the locale for the native Strings, that are passed to NCurses and makes NCurses use wide/unicode chars
 sub setlocale(int32, Str) returns Str is native(Str) {*};
+
+# wprintw isn't a part of the NCurses NativeCall version... for some reason
+sub wprintw(WINDOW, Str) returns int32 is native(&library) {*};
 
 # Init Function
 sub ui-init is export {
@@ -29,16 +33,13 @@ sub infix:<all>(@w, $m) {
 }
 
 # Fields in the top bar and the bottom bar
+# This is just a convenient way of storing, where the printw has to start to overwrite status info, like the player's High Score...
 class Field {
 	has $.x-anchor;
 	has $.y-anchor;
 
 	method new ($y-anchor, $x-anchor) {
 		self.bless(:$y-anchor, :$x-anchor)
-	}
-
-	method move-to {
-		move($.y-anchor, $.x-anchor);
 	}
 }
 
@@ -50,15 +51,23 @@ class Window is export {
 	has $.y;
 	has $.window;
 
-	# Make a new window
-	method new ($height, $width, $y, $x) {
-
+	# Make a new NCurses Window
+	method create-window ($height, $width, $y, $x) {
 		# Create the window
 		my $window = newwin($height, $width, $y, $x);
 
 		# Render it
 		wrefresh($window);
 		nc_refresh;
+
+		return $window
+	}
+
+
+	# Make a new window
+	method new ($height, $width, $y, $x) {
+
+		my $window = self.create-window($height, $width, $y, $x);
 
 		# Return the window object
 		return self.bless(:$height, :$width, :$y, :$x, :$window)
@@ -82,6 +91,10 @@ class Window is export {
 		nc_refresh;
 	}
 
+	method wprintw ($str) {
+		wprintw($.window, $str);
+	}
+
 	method mvprintw ($y, $x, $str) {
 		mvwprintw($.window, $y, $x, $str)
 	}
@@ -97,15 +110,17 @@ class Window is export {
 	method refresh {
 		wrefresh($.window)
 	}
+
+	method move ($y, $x) {
+		wmove($.window, $y, $x)
+	}
 }
 
 # Top Window
 class Top is Window is export {
-	#has Field $.l-field;
-	#has Field $.r-field;
 	has $.snake-field;
 	has $.snake-message;
-	has $.hi-score-field;
+	has Field $.hi-score-field;
 
 	# This code also works: it slurps up the parameters...
 	# method new (*%params) {
@@ -115,19 +130,42 @@ class Top is Window is export {
 
 	method new ($height, $width, $y, $x, $snake-message, $max-score) {
 
-
 		# Create the window
-		my $window = newwin($height, $width, $y, $x);
+		my $window = self.create-window($height, $width, $y, $x);
 
-		# Render it
-		wrefresh($window);
-		nc_refresh;
-
+		# Make a field as left as they come
 		my $snake-field = Field.new(0,0);
 
-		my $hi-score-field = Field.new(0, $max-score.elems);
+		# Now for the right side, bright side!
+		# Note: the message is 'Hi:  892' or whatever the score is and however long the max score is
+		my $hi-score-field = Field.new(0, ($width - $max-score.base(10).chars - 1 - "Hi:".chars));
+		# Note: the -1 adds a space of separation for aesthetic reasons
 
+		# Maaaake Snaaaake Tooooop Windoooooooow
 		return self.bless(:$height, :$width, :$y, :$x, :$window, :$snake-message, :$snake-field, :$hi-score-field)
+	}
+
+	# Print the Message on the Left Side of the Top Window
+	method print-snake-field {
+		self.move($.snake-field.y-anchor, $.snake-field.x-anchor);
+		self.wprintw(self.snake-message);
+	}
+
+	# Print the Message on the Right Side of the Top Window... that's the High Score
+	method print-hi-score-field ($High-Score) {
+
+		# Compute the string for the field
+
+		my $message = "HI:";
+		my $number-of-spaces = self.width - self.hi-score-field.x-anchor - $message.chars - $High-Score.base(10).chars;
+
+		for 0..$number-of-spaces { $message = $message ~ " " }
+
+		$message = $message ~ $High-Score.base(10);
+
+		# Print the field
+		self.move($.hi-score-field.y-anchor, $.hi-score-field.x-anchor);
+		self.wprintw($message);
 	}
 }
 
@@ -152,9 +190,12 @@ sub welcome-screen (@windows) is export {
 	@windows all "bkgd";
 
 	# Add some Text
-	$top.mvprintw(0, 0, "SNAKE!");
+	#$top.mvprintw(0, 0, "SNAKE!");
 	$mid.mvprintw(5, 5, "wheee ƣ");
 	$bot.mvprintw(0, 0, "sldkfjsdlfkj");
+
+	$top.print-snake-field;
+	$top.print-hi-score-field(228);
 
 	# Refresh
 	@windows all "refresh";
