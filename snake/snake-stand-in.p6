@@ -34,3 +34,8 @@ sub MAIN(Int $height=10, Int $width=40) {
 	start-up($height, $width, 0.5, 5, 1, 3, Right)
 
 }
+
+
+# Potential Multi-Player:
+# Put the Message-Generation Logic for High-Score and the Player-Score Displays in the players themselves, have the players have an ID or a name...
+# Then you can go: player 3:  SCORE | player 2: SCORE etc

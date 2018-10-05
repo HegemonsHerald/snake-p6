@@ -397,7 +397,7 @@ sub render {
 sub game-start is export {
 
 	# Render the initial screen
-	welcome-screen(@WINDOWS);
+	welcome-screen(@WINDOWS, $SETTINGS.high-score);
 
 }
 
@@ -423,7 +423,7 @@ sub game is export {
 sub game-over is export {
 
 	# Render the game over screen
-	game-over-screen(@WINDOWS);
+	game-over-screen(@WINDOWS, $SETTINGS.high-score);
 
 }
 
