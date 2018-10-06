@@ -122,8 +122,7 @@ class Window is export {
 		wprintw($.window, $str);
 	}
 
-	method mvprintw ($y, $x, $str) {
-		mvwprintw($.window, $y, $x, $str)
+	window, $y, $x, $str)
 	}
 
 	method color ($color-pair) {
