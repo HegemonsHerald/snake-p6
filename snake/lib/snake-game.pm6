@@ -33,7 +33,7 @@ class Snake {
 	has $.game-over is rw = False;
 	has $.score is rw;
 	has $.direction;
-	has $.growth = 10;
+	has $.growth = 0;
 
 	# Creation shorthand
 	method create {

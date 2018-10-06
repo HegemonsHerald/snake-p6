@@ -31,7 +31,25 @@ use snake-game;
 
 sub MAIN(Int $height=0, Int $width=0) {
 
-	start-up($height, $width, 0.5, 5, 1, 3, Right)
+	# If $height and $width are equal to 0,
+	# the Game Window will take up the entire screen
+
+	# The minimum width for the game is 5
+	if 0 < $width < 5 {
+		die "The Game Window needs to be at least 5 units wide!";
+	}
+
+	# The window size can't be negative
+	if $width < 0 || $height < 0 {
+		die "The Game Window can't be negative, dummy!";
+	}
+
+	# Adjust start length of snake for tiny game boards
+	my $start-length = 5;
+	if $width < 10 { $start-length = 1 }
+
+	# Do the game bit!
+	start-up($height, $width, 0.5, $start-length, 1, 3, Right)
 
 }
 
