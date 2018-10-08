@@ -4,6 +4,23 @@ use NativeCall;
 
 unit module snake-ui;
 
+
+# Welcome and Game Over Screen messages
+our $WELCOME-SCREEN-PROMPT = "Please press Any Key to start the game SNAKE!";
+our @WELCOME-SCREEN-MESSAGE-XXL = [' ╔═════╗   ╔══╗  ╔══╗        ╔══╗        ╔══╗ ╔══╗  ╔════════╗  ╔══╗',
+'╔╝█████╚╗  ║██╚╗ ║██║       ╔╝██╚╗       ║██║╔╝██║  ║████████║  ║██║',
+'║██╔═╗██║  ║███╚╗║██║      ╔╝████╚╗      ║██╠╝██╔╝  ║██╔═════╝  ║██║',
+'║██║ ╚══╝  ║████╚╣██║     ╔╝██╔╗██╚╗     ║██║██╔╝   ║██║        ║██║',
+'║██╚════╗  ║██║██║██║    ╔╝██═╩╩═██╚╗    ║█████║    ║██╚═════╗  ║██║',
+'╚╗██████║  ║██╠╗████║   ╔╝██████████╚╗   ║██║██╚╗   ║████████║  ╚══╝',
+'╔╩════██║  ║██║╚╗███║  ╔╝██╔══════╗██╚╗  ║██╠╗██╚╗  ║██══════╣  ╔══╗',
+'║██████╔╝  ║██║ ╚╗██║  ║██╔╝      ╚╗██║  ║██║╚╗██║  ║████████║  ║██║',
+'╚══════╝   ╚══╝  ╚══╝  ╚══╝        ╚══╝  ╚══╝ ╚══╝  ╚════════╝  ╚══╝',
+$WELCOME-SCREEN-PROMPT];
+
+
+
+
 # setlocale from libc, sets the locale for the native Strings, that are passed to NCurses and makes NCurses use wide/unicode chars
 sub setlocale(int32, Str) returns Str is native(Str) {*};
 
@@ -122,7 +139,9 @@ class Window is export {
 		wprintw($.window, $str);
 	}
 
-	window, $y, $x, $str)
+	method mvprintw ($y, $x, $str) {
+		wmove($.window, $y, $x);
+		self.wprintw($str);
 	}
 
 	method color ($color-pair) {
@@ -242,6 +261,23 @@ sub welcome-screen (@windows, $high-score) is export {
 	$mid.mvprintw(5, 5, "wheee ƣ");
 	$bot.mvprintw(0, 0, "sldkfjsdlfkj");
 
+
+	# this shit obviously goes into a method call!
+	say getmax
+	#my $message-start-y = (getmaxy($mid) div 2) - (@WELCOME-SCREEN-MESSAGE-XXL.elems div 2);
+	#my $message-start-x = getmaxx($mid) div 2 - @WELCOME-SCREEN-MESSAGE-XXL[0].chars div 2;
+	# SOMETHING WITH THE GETMAX IS GOING WRONG!!!
+	my $message-start-y = 23;
+	my $message-start-x = 23;
+	for @WELCOME-SCREEN-MESSAGE-XXL.kv -> $ind, $line {
+		$mid.mvprintw($message-start-y + $ind, $message-start-x, $line);
+	}
+
+	# the middle is at $h/2 and $w/2 rounded down => starting position of the snake
+	# the message start is at $y-middle - welcome-screen-message.elems div 2
+	# 			  $x-middle - welcome-screen-message[0].chars
+	# this of course assumes,that 0 has the length of the entire box, but who cares?
+	
 	# Print the Top Bar
 	$top.print-snake-field;
 	$top.print-high-score-field($high-score);
