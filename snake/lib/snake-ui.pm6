@@ -6,21 +6,34 @@ unit module snake-ui;
 
 # Welcome and Game Over Screen messages
 
+# Small-ish
+our $WELCOME-SCREEN-PROMPT_1 = 'Please press';
+our $WELCOME-SCREEN-PROMPT_2 = '  Any Key';
+our $WELCOME-SCREEN-PROMPT_3 = '  to start';
+our $WELCOME-SCREEN-PROMPT_4 = '  the Game!';
+our @WELCOME-SCREEN-MESSAGE = ['   SNAKE!   ',
+'',
+$WELCOME-SCREEN-PROMPT_1,
+$WELCOME-SCREEN-PROMPT_2,
+$WELCOME-SCREEN-PROMPT_3,
+$WELCOME-SCREEN-PROMPT_4,
+];
+
 # Not small but not too big
-our $WELCOME-SCREEN-PROMPT-XL_1 = '       Please press Any Key';
-our $WELCOME-SCREEN-PROMPT-XL_2 = '     to start the game SNAKE!';
-our @WELCOME-SCREEN-MESSAGE-XL = [ ' ____  _   _    _    _  _______ _ ',
+our $WELCOME-SCREEN-PROMPT-L_1 = '       Please press Any Key';
+our $WELCOME-SCREEN-PROMPT-L_2 = '     to start the game SNAKE!';
+our @WELCOME-SCREEN-MESSAGE-L = [ ' ____  _   _    _    _  _______ _ ',
 '/ ___|| \ | |  / \  | |/ / ____| |',
 '\___ \|  \| | / _ \ | \' /|  _| | |',
 ' ___) | |\  |/ ___ \| . \| |___|_|',
 '|____/|_| \_/_/   \_\_|\_\_____(_)',
 '',
-"$WELCOME-SCREEN-PROMPT-XL_1",
-"$WELCOME-SCREEN-PROMPT-XL_2", ];
+"$WELCOME-SCREEN-PROMPT-L_1",
+"$WELCOME-SCREEN-PROMPT-L_2", ];
 
 # Friggin humongous
-our $WELCOME-SCREEN-PROMPT-XXL = "Please press Any Key to start the game SNAKE!";
-our @WELCOME-SCREEN-MESSAGE-XXL = [ ' ╔═════╗   ╔══╗  ╔══╗        ╔══╗        ╔══╗ ╔══╗  ╔════════╗  ╔══╗',
+our $WELCOME-SCREEN-PROMPT-XL = "Please press Any Key to start the game SNAKE!";
+our @WELCOME-SCREEN-MESSAGE-XL = [ ' ╔═════╗   ╔══╗  ╔══╗        ╔══╗        ╔══╗ ╔══╗  ╔════════╗  ╔══╗',
 '╔╝█████╚╗  ║██╚╗ ║██║       ╔╝██╚╗       ║██║╔╝██║  ║████████║  ║██║',
 '║██╔═╗██║  ║███╚╗║██║      ╔╝████╚╗      ║██╠╝██╔╝  ║██╔═════╝  ║██║',
 '║██║ ╚══╝  ║████╚╣██║     ╔╝██╔╗██╚╗     ║██║██╔╝   ║██║        ║██║',
@@ -30,12 +43,13 @@ our @WELCOME-SCREEN-MESSAGE-XXL = [ ' ╔═════╗   ╔══╗  ╔�
 '║██████╔╝  ║██║ ╚╗██║  ║██╔╝      ╚╗██║  ║██║╚╗██║  ║████████║  ║██║',
 '╚══════╝   ╚══╝  ╚══╝  ╚══╝        ╚══╝  ╚══╝ ╚══╝  ╚════════╝  ╚══╝',
 '',
-"          $WELCOME-SCREEN-PROMPT-XXL" ];
+"          $WELCOME-SCREEN-PROMPT-XL" ];
 
 # Collection of possible messages
 our @WELCOME-SCREEN-MESSAGE-OPTIONS = [
-	@WELCOME-SCREEN-MESSAGE-XXL,
 	@WELCOME-SCREEN-MESSAGE-XL,
+	@WELCOME-SCREEN-MESSAGE-L,
+	@WELCOME-SCREEN-MESSAGE,
 ];
 
 
@@ -172,6 +186,10 @@ class Window is export {
 		wattron($.window, $attr)
 	}
 
+	method attroff ($attr) {
+		wattroff($.window, $attr)
+	}
+
 	method refresh {
 		wrefresh($.window)
 	}
@@ -233,6 +251,7 @@ class Middle is Window is export {
 	method print-welcome-message($height, $width) {
 		my @welcome-screen-message;
 
+		# Figure out, which size message to print
 		for @WELCOME-SCREEN-MESSAGE-OPTIONS -> @message {
 			unless @message[0].chars >= $width || @message.elems >= $height {
 				@welcome-screen-message = @message;
@@ -240,8 +259,11 @@ class Middle is Window is export {
 			}
 		}
 
+		# Find the starting position for drawing the message's parts
 		my $message-start-y = $height div 2 - @welcome-screen-message.elems div 2;
 		my $message-start-x = $width div 2 - @welcome-screen-message[0].chars div 2;
+
+		# Print the message
 		for @welcome-screen-message.kv -> $ind, $line {
 			self.mvprintw($message-start-y + $ind, $message-start-x, $line);
 		}
