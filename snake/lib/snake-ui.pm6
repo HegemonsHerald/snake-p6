@@ -4,10 +4,23 @@ use NativeCall;
 
 unit module snake-ui;
 
-
 # Welcome and Game Over Screen messages
-our $WELCOME-SCREEN-PROMPT = "Please press Any Key to start the game SNAKE!";
-our @WELCOME-SCREEN-MESSAGE-XXL = [' ╔═════╗   ╔══╗  ╔══╗        ╔══╗        ╔══╗ ╔══╗  ╔════════╗  ╔══╗',
+
+# Not small but not too big
+our $WELCOME-SCREEN-PROMPT-XL_1 = '       Please press Any Key';
+our $WELCOME-SCREEN-PROMPT-XL_2 = '     to start the game SNAKE!';
+our @WELCOME-SCREEN-MESSAGE-XL = [ ' ____  _   _    _    _  _______ _ ',
+'/ ___|| \ | |  / \  | |/ / ____| |',
+'\___ \|  \| | / _ \ | \' /|  _| | |',
+' ___) | |\  |/ ___ \| . \| |___|_|',
+'|____/|_| \_/_/   \_\_|\_\_____(_)',
+'',
+"$WELCOME-SCREEN-PROMPT-XL_1",
+"$WELCOME-SCREEN-PROMPT-XL_2", ];
+
+# Friggin humongous
+our $WELCOME-SCREEN-PROMPT-XXL = "Please press Any Key to start the game SNAKE!";
+our @WELCOME-SCREEN-MESSAGE-XXL = [ ' ╔═════╗   ╔══╗  ╔══╗        ╔══╗        ╔══╗ ╔══╗  ╔════════╗  ╔══╗',
 '╔╝█████╚╗  ║██╚╗ ║██║       ╔╝██╚╗       ║██║╔╝██║  ║████████║  ║██║',
 '║██╔═╗██║  ║███╚╗║██║      ╔╝████╚╗      ║██╠╝██╔╝  ║██╔═════╝  ║██║',
 '║██║ ╚══╝  ║████╚╣██║     ╔╝██╔╗██╚╗     ║██║██╔╝   ║██║        ║██║',
@@ -16,7 +29,14 @@ our @WELCOME-SCREEN-MESSAGE-XXL = [' ╔═════╗   ╔══╗  ╔�
 '╔╩════██║  ║██║╚╗███║  ╔╝██╔══════╗██╚╗  ║██╠╗██╚╗  ║██══════╣  ╔══╗',
 '║██████╔╝  ║██║ ╚╗██║  ║██╔╝      ╚╗██║  ║██║╚╗██║  ║████████║  ║██║',
 '╚══════╝   ╚══╝  ╚══╝  ╚══╝        ╚══╝  ╚══╝ ╚══╝  ╚════════╝  ╚══╝',
-$WELCOME-SCREEN-PROMPT];
+'',
+"          $WELCOME-SCREEN-PROMPT-XXL" ];
+
+# Collection of possible messages
+our @WELCOME-SCREEN-MESSAGE-OPTIONS = [
+	@WELCOME-SCREEN-MESSAGE-XXL,
+	@WELCOME-SCREEN-MESSAGE-XL,
+];
 
 
 
@@ -208,6 +228,27 @@ class Top is Window is export {
 	}
 }
 
+# Middle Window
+class Middle is Window is export {
+	method print-welcome-message($height, $width) {
+		my @welcome-screen-message;
+
+		for @WELCOME-SCREEN-MESSAGE-OPTIONS -> @message {
+			unless @message[0].chars >= $width || @message.elems >= $height {
+				@welcome-screen-message = @message;
+				last;
+			}
+		}
+
+		my $message-start-y = $height div 2 - @welcome-screen-message.elems div 2;
+		my $message-start-x = $width div 2 - @welcome-screen-message[0].chars div 2;
+		for @welcome-screen-message.kv -> $ind, $line {
+			self.mvprintw($message-start-y + $ind, $message-start-x, $line);
+		}
+	}
+}
+
+
 # Bottom Window
 class Bottom is Window is export {
 	has Score-Field $.score-field;
@@ -239,7 +280,7 @@ class Bottom is Window is export {
 
 
 # Render Initial Welcome Screen
-sub welcome-screen (@windows, $high-score) is export {
+sub welcome-screen (@windows, $height, $width, $high-score) is export {
 
 	# Shortcuts
 	my ($top, $mid, $bot) = @windows[1..3];
@@ -261,23 +302,10 @@ sub welcome-screen (@windows, $high-score) is export {
 	$mid.mvprintw(5, 5, "wheee ƣ");
 	$bot.mvprintw(0, 0, "sldkfjsdlfkj");
 
-
 	# this shit obviously goes into a method call!
-	say getmax
-	#my $message-start-y = (getmaxy($mid) div 2) - (@WELCOME-SCREEN-MESSAGE-XXL.elems div 2);
-	#my $message-start-x = getmaxx($mid) div 2 - @WELCOME-SCREEN-MESSAGE-XXL[0].chars div 2;
 	# SOMETHING WITH THE GETMAX IS GOING WRONG!!!
-	my $message-start-y = 23;
-	my $message-start-x = 23;
-	for @WELCOME-SCREEN-MESSAGE-XXL.kv -> $ind, $line {
-		$mid.mvprintw($message-start-y + $ind, $message-start-x, $line);
-	}
+	$mid.print-welcome-message($height, $width);
 
-	# the middle is at $h/2 and $w/2 rounded down => starting position of the snake
-	# the message start is at $y-middle - welcome-screen-message.elems div 2
-	# 			  $x-middle - welcome-screen-message[0].chars
-	# this of course assumes,that 0 has the length of the entire box, but who cares?
-	
 	# Print the Top Bar
 	$top.print-snake-field;
 	$top.print-high-score-field($high-score);
@@ -304,7 +332,7 @@ our sub render (@windows) {
 }
 
 # Render Game Over Screen
-sub game-over-screen (@windows, $high-score) is export {
+sub game-over-screen (@windows, $height, $width, $high-score) is export {
 
 	# Shortcuts
 	my ($top, $mid, $bot) = @windows[1..3];
