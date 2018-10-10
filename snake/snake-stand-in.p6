@@ -46,7 +46,7 @@ sub MAIN(Int $height=0, Int $width=0) {
 
 	# Adjust start length of snake for tiny game boards
 	my $start-length = 5;
-	if $width < 10 { $start-length = 1 }
+	if 0 < $width < 10 { $start-length = 1 }
 
 	# Do the game bit!
 	start-up($height, $width, 0.5, $start-length, 1, 3, Right)

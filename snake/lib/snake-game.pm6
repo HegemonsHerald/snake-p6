@@ -381,6 +381,7 @@ sub max-score {
 # Render Function Wrapper
 sub render {
 	unless $GAME-OVER {
+		say-snake;
 		snake-ui::render(@WINDOWS);
 	}
 

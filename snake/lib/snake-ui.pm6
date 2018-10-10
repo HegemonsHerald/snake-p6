@@ -32,7 +32,7 @@ our @WELCOME-SCREEN-MESSAGE-L = [ ' ____  _   _    _    _  _______ _ ',
 "$WELCOME-SCREEN-PROMPT-L_2", ];
 
 # Friggin humongous
-our $WELCOME-SCREEN-PROMPT-XL = "Please press Any Key to start the game SNAKE!";
+our $WELCOME-SCREEN-PROMPT-XL = "           Please press Any Key to start the game SNAKE!";
 our @WELCOME-SCREEN-MESSAGE-XL = [ ' ╔═════╗   ╔══╗  ╔══╗        ╔══╗        ╔══╗ ╔══╗  ╔════════╗  ╔══╗',
 '╔╝█████╚╗  ║██╚╗ ║██║       ╔╝██╚╗       ║██║╔╝██║  ║████████║  ║██║',
 '║██╔═╗██║  ║███╚╗║██║      ╔╝████╚╗      ║██╠╝██╔╝  ║██╔═════╝  ║██║',
@@ -43,7 +43,7 @@ our @WELCOME-SCREEN-MESSAGE-XL = [ ' ╔═════╗   ╔══╗  ╔�
 '║██████╔╝  ║██║ ╚╗██║  ║██╔╝      ╚╗██║  ║██║╚╗██║  ║████████║  ║██║',
 '╚══════╝   ╚══╝  ╚══╝  ╚══╝        ╚══╝  ╚══╝ ╚══╝  ╚════════╝  ╚══╝',
 '',
-"          $WELCOME-SCREEN-PROMPT-XL" ];
+"$WELCOME-SCREEN-PROMPT-XL" ];
 
 # Collection of possible messages
 our @WELCOME-SCREEN-MESSAGE-OPTIONS = [
