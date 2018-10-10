@@ -319,22 +319,15 @@ sub welcome-screen (@windows, $height, $width, $high-score) is export {
 	# Make the windows visible
 	@windows all "bkgd";
 
-	# Add some Text
-	#$top.mvprintw(0, 0, "SNAKE!");
-	$mid.mvprintw(5, 5, "wheee ƣ");
-	$bot.mvprintw(0, 0, "sldkfjsdlfkj");
-
-	# this shit obviously goes into a method call!
-	# SOMETHING WITH THE GETMAX IS GOING WRONG!!!
-	$mid.print-welcome-message($height, $width);
-
 	# Print the Top Bar
 	$top.print-snake-field;
 	$top.print-high-score-field($high-score);
 
-	# Print the Startup Screen
+	# Print the Startup Screen aka Welcome Message
+	$mid.print-welcome-message($height, $width);
 
 	# Nothing to do for the Bottom Bar
+	# ...
 
 	# Refresh
 	@windows all "refresh";
@@ -342,7 +335,9 @@ sub welcome-screen (@windows, $height, $width, $high-score) is export {
 	move(0,0);
 
 	# Wait for Input
-	loop {}
+	noecho();
+	getch();
+
 }
 
 # General Render Function
