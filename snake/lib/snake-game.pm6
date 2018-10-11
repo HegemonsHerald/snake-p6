@@ -381,8 +381,7 @@ sub max-score {
 # Render Function Wrapper
 sub render {
 	unless $GAME-OVER {
-		say-snake;
-		snake-ui::render(@WINDOWS);
+		snake-ui::render-game(@WINDOWS, @PLAYERS, @FOODS);
 	}
 
 	# Note: the *GAME-OVER check here is necessary, cause the check
@@ -398,7 +397,7 @@ sub render {
 sub game-start is export {
 
 	# Render the initial screen
-	welcome-screen(@WINDOWS, $HEIGHT, $WIDTH, $SETTINGS.high-score);
+	welcome-screen(@WINDOWS, $SETTINGS.high-score);
 
 }
 
@@ -458,8 +457,8 @@ sub start-up (Int $height, Int $width, $speed, $length, $worth, $growth, $start-
 	# Init thingies
 	our $ABS-HEIGHT	= $h;			# absolute height
 	our $ABS-WIDTH	= $w;			# absolute width
-	our $HEIGHT	= $ABS-HEIGHT - 2;	# height of the game board
-	our $WIDTH	= $ABS-WIDTH;		# width of the game board
+	our $HEIGHT	= $ABS-HEIGHT - 2;	# height of the game board for the game logic
+	our $WIDTH	= $ABS-WIDTH;		# width of the game board for the game logic
 	our $H-OFFSET	= 1;			# offset for the renderer: add this to all game element's Y-position-values to offset against the borders...
 	our $W-OFFSET	= 0;			# offset for the renderer: add this to all game element's X-position-values to offset against the borders...
 	our @PLAYERS	= [];

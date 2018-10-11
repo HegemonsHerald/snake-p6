@@ -197,6 +197,11 @@ class Window is export {
 	method move ($y, $x) {
 		wmove($.window, $y, $x)
 	}
+
+	method clear {
+		wclear($.window);
+		self.refresh;
+	}
 }
 
 # Top Window
@@ -248,20 +253,20 @@ class Top is Window is export {
 
 # Middle Window
 class Middle is Window is export {
-	method print-welcome-message($height, $width) {
+	method print-welcome-message {
 		my @welcome-screen-message;
 
 		# Figure out, which size message to print
 		for @WELCOME-SCREEN-MESSAGE-OPTIONS -> @message {
-			unless @message[0].chars >= $width || @message.elems >= $height {
+			unless @message[0].chars >= $.width || @message.elems >= $.height {
 				@welcome-screen-message = @message;
 				last;
 			}
 		}
 
 		# Find the starting position for drawing the message's parts
-		my $message-start-y = $height div 2 - @welcome-screen-message.elems div 2;
-		my $message-start-x = $width div 2 - @welcome-screen-message[0].chars div 2;
+		my $message-start-y = $.height div 2 - @welcome-screen-message.elems div 2;
+		my $message-start-x = $.width div 2 - @welcome-screen-message[0].chars div 2;
 
 		# Print the message
 		for @welcome-screen-message.kv -> $ind, $line {
@@ -302,7 +307,7 @@ class Bottom is Window is export {
 
 
 # Render Initial Welcome Screen
-sub welcome-screen (@windows, $height, $width, $high-score) is export {
+sub welcome-screen (@windows, $high-score) is export {
 
 	# Shortcuts
 	my ($top, $mid, $bot) = @windows[1..3];
@@ -324,7 +329,7 @@ sub welcome-screen (@windows, $height, $width, $high-score) is export {
 	$top.print-high-score-field($high-score);
 
 	# Print the Startup Screen aka Welcome Message
-	$mid.print-welcome-message($height, $width);
+	$mid.print-welcome-message;
 
 	# Nothing to do for the Bottom Bar
 	# ...
@@ -341,15 +346,35 @@ sub welcome-screen (@windows, $height, $width, $high-score) is export {
 }
 
 # General Render Function
-our sub render (@windows) {
+our sub render-game (@windows, @players, @foods) {
 
-	# Render Game
-	# ...
+	my $mid = @windows[2];
 
+	# Clear the game window
+	$mid.clear;
+	$mid.move(0,0);
+
+	# Render Foods
+	for @foods -> $food {
+		$mid.mvprintw($food.position.y, $food.position.x, "●");
+		$mid.move(0,0);
+	}
+
+	# Render Snake
+	for @players -> $player {
+		for $player.segments -> $segment {
+			$mid.mvprintw($segment.y, $segment.x, "○");
+			$mid.move(0,0);
+		}
+	}
+
+
+	$mid.refresh;
+	nc_refresh;
 }
 
 # Render Game Over Screen
-sub game-over-screen (@windows, $height, $width, $high-score) is export {
+sub game-over-screen (@windows, $high-score) is export {
 
 	# Shortcuts
 	my ($top, $mid, $bot) = @windows[1..3];
