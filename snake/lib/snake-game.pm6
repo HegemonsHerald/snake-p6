@@ -20,8 +20,8 @@ our @WINDOWS;
 
 # Points for the segments of the snake
 class Point {
-	has $.x;
-	has $.y;
+	has $.x is rw;
+	has $.y is rw;
 }
 
 # Snake Movement Direction
@@ -29,7 +29,7 @@ enum Direction is export <Up Down Left Right>;
 
 # Snake object
 class Snake {
-	has @.segments;
+	has @.segments is rw;
 	has $.game-over is rw = False;
 	has $.score is rw;
 	has $.direction;
@@ -210,9 +210,9 @@ class Snake {
 		# Check in which direction to move
 		given $dir {
 			when Up {	$y--; if $y == -1	{ $y = $HEIGHT } }
-			when Down {	$y++; if $y == $HEIGHT	{ $y=0 } }
-			when Right {	$x++; if $x == $WIDTH	{ $x=0 } }
-			when Left {	$x--; if $x == -1	{ $x=$WIDTH } }
+			when Down {	$y++; if $y == $HEIGHT	{ $y = 0 } }
+			when Right {	$x++; if $x == $WIDTH	{ $x = 0 } }
+			when Left {	$x--; if $x == -1	{ $x = $WIDTH } }
 		}
 
 		# Return the new head's point
@@ -468,7 +468,7 @@ sub start-up (Int $height, Int $width, $speed, $length, $worth, $growth, $start-
 	# Init thingies
 	our $ABS-HEIGHT	= $h;			# absolute height
 	our $ABS-WIDTH	= $w;			# absolute width
-	our $HEIGHT	= $ABS-HEIGHT - 2;	# height of the game board for the game logic
+	our $HEIGHT	= $ABS-HEIGHT - 2 - 1;	# height of the game board for the game logic; -2 for the top and bottom status lines, -1 because the game board is 0-indexed, but the ABS-HEIGHT isn't: to make 0 out of 1 you go 1-1, to make game-board-height out of height you go height-1
 	our $WIDTH	= $ABS-WIDTH div 2;	# width of the game board for the game logic... div 2 cause of a renderer peculiarity
 	our $H-OFFSET	= 1;			# offset for the renderer: add this to all game element's Y-position-values to offset against the borders...
 	our $W-OFFSET	= 0;			# offset for the renderer: add this to all game element's X-position-values to offset against the borders...
