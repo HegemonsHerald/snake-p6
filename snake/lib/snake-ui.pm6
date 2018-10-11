@@ -356,14 +356,14 @@ our sub render-game (@windows, @players, @foods) {
 
 	# Render Foods
 	for @foods -> $food {
-		$mid.mvprintw($food.position.y, $food.position.x, "●");
+		$mid.mvprintw($food.position.y, $food.position.x * 2, " ●");
 		$mid.move(0,0);
 	}
 
 	# Render Snake
 	for @players -> $player {
 		for $player.segments -> $segment {
-			$mid.mvprintw($segment.y, $segment.x, "○");
+			$mid.mvprintw($segment.y, $segment.x * 2, " ○");
 			$mid.move(0,0);
 		}
 	}

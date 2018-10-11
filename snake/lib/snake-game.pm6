@@ -457,8 +457,8 @@ sub start-up (Int $height, Int $width, $speed, $length, $worth, $growth, $start-
 	# Init thingies
 	our $ABS-HEIGHT	= $h;			# absolute height
 	our $ABS-WIDTH	= $w;			# absolute width
-	our $HEIGHT	= $ABS-HEIGHT - 2;	# height of the game board for the game logic
-	our $WIDTH	= $ABS-WIDTH;		# width of the game board for the game logic
+	our $HEIGHT	= ($ABS-HEIGHT - 2) div 2;	# height of the game board for the game logic
+	our $WIDTH	= ($ABS-WIDTH) div 2;		# width of the game board for the game logic
 	our $H-OFFSET	= 1;			# offset for the renderer: add this to all game element's Y-position-values to offset against the borders...
 	our $W-OFFSET	= 0;			# offset for the renderer: add this to all game element's X-position-values to offset against the borders...
 	our @PLAYERS	= [];
@@ -469,7 +469,7 @@ sub start-up (Int $height, Int $width, $speed, $length, $worth, $growth, $start-
 	# Let's make some windows...
 	# ...			  	height	   		width       	y			x
 	@WINDOWS.push: Top.new(		1,			$ABS-WIDTH,	0,			0,	"SNAKE!!!",	max-score);	# ... top bar
-	@WINDOWS.push: Middle.new(	$HEIGHT,		$ABS-WIDTH,	1,			0);					# ... game board
+	@WINDOWS.push: Middle.new(	$ABS-HEIGHT - 2,	$ABS-WIDTH,	1,			0);					# ... game board
 	@WINDOWS.push: Bottom.new(	1,			$ABS-WIDTH,	$ABS-HEIGHT - 1,	0,	max-score);			# ... bottom bar
 
 	# run the game!
