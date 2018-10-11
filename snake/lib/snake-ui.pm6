@@ -67,10 +67,19 @@ sub ui-init is export {
         # set locale to en_US.UTF-8 for Unicode Char support
         setlocale(0, "");
 
+	# init screen
+        our $window = initscr() or die "Failed to initialize ncurses\n";
+
+	# get support for special keys (like arrows!)
+	keypad($window, TRUE);
+
+	# don't wait for EOLs when getting input
         cbreak;
+
+	# don't print, what's input
         noecho;
 
-        our $window = initscr() or die "Failed to initialize ncurses\n";
+	# update to make it all real
         nc_refresh;
 
         return $window
@@ -362,7 +371,7 @@ our sub render-game (@windows, @players, @foods) {
 
 	# Render Snake
 	for @players -> $player {
-		for $player.segments -> $segment {
+		for $player.segments.kv -> $ind, $segment {
 			$mid.mvprintw($segment.y, $segment.x * 2, " ○");
 			$mid.move(0,0);
 		}

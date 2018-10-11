@@ -415,6 +415,23 @@ sub game is export {
 	while !$GAME-OVER {
 
 		# Wait for input
+		my $input = getch;
+
+		given $input {
+			# 104 = h, 260 = left_arrow
+			when 104 | KEY_LEFT {	@PLAYERS[0].move(Left); render }
+
+			# 106 = j, 258 = down_arrow
+			when 106 | KEY_DOWN {	@PLAYERS[0].move(Down); render }
+
+			# 107 = k, 259 = up_arrow
+			when 107 | KEY_UP {	@PLAYERS[0].move(Up); render }
+
+			# 108 = l, 261 = right_arrow
+			when 108 | KEY_RIGHT {	@PLAYERS[0].move(Right); render }
+
+			default { say $input }
+		}
 
 	}
 }
@@ -457,8 +474,8 @@ sub start-up (Int $height, Int $width, $speed, $length, $worth, $growth, $start-
 	# Init thingies
 	our $ABS-HEIGHT	= $h;			# absolute height
 	our $ABS-WIDTH	= $w;			# absolute width
-	our $HEIGHT	= ($ABS-HEIGHT - 2) div 2;	# height of the game board for the game logic
-	our $WIDTH	= ($ABS-WIDTH) div 2;		# width of the game board for the game logic
+	our $HEIGHT	= $ABS-HEIGHT - 2;	# height of the game board for the game logic
+	our $WIDTH	= $ABS-WIDTH div 2;	# width of the game board for the game logic... div 2 cause of a renderer peculiarity
 	our $H-OFFSET	= 1;			# offset for the renderer: add this to all game element's Y-position-values to offset against the borders...
 	our $W-OFFSET	= 0;			# offset for the renderer: add this to all game element's X-position-values to offset against the borders...
 	our @PLAYERS	= [];
