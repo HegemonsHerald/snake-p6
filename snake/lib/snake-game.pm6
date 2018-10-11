@@ -209,16 +209,10 @@ class Snake {
 
 		# Check in which direction to move
 		given $dir {
-			when Up {
-				$y--;
-				# TODO I don't know, whether ncurses screens are zero-indexed or one-indexed
-				if $y == 0 {
-					$y = $HEIGHT;
-				}
-			}
-			when Down { $y++; if $y == $HEIGHT { $y=0 } }
-			when Right { $x++; if $x == $WIDTH { $x=0 } }
-			when Left { $x--; if $x == 0 { $x=$WIDTH } }
+			when Up {	$y--; if $y == -1	{ $y = $HEIGHT } }
+			when Down {	$y++; if $y == $HEIGHT	{ $y=0 } }
+			when Right {	$x++; if $x == $WIDTH	{ $x=0 } }
+			when Left {	$x--; if $x == -1	{ $x=$WIDTH } }
 		}
 
 		# Return the new head's point
