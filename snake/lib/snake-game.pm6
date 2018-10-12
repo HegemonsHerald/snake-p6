@@ -439,7 +439,7 @@ sub game-over is export {
 }
 
 # Kickoff!
-sub start-up (Int $height, Int $width, $speed, $length, $worth, $growth, $start-direction) is export {
+sub start-up ($height, $width, $speed, $length, $worth, $growth, $start-direction) is export {
 
 	# Init NCurses
 	our @WINDOWS	= [];
@@ -465,13 +465,19 @@ sub start-up (Int $height, Int $width, $speed, $length, $worth, $growth, $start-
 		$w = $x;
 	}
 
+	# Make sure the width is evenly divisible (cause game logic runs at half-width of render-logic)
+	if $w % 2 == 1 {
+		$w--
+	}
+	
+
 	# Init thingies
-	our $ABS-HEIGHT	= $h;			# absolute height
-	our $ABS-WIDTH	= $w;			# absolute width
-	our $HEIGHT	= $ABS-HEIGHT - 2 - 1;	# height of the game board for the game logic; -2 for the top and bottom status lines, -1 because the game board is 0-indexed, but the ABS-HEIGHT isn't: to make 0 out of 1 you go 1-1, to make game-board-height out of height you go height-1
-	our $WIDTH	= $ABS-WIDTH div 2;	# width of the game board for the game logic... div 2 cause of a renderer peculiarity
-	our $H-OFFSET	= 1;			# offset for the renderer: add this to all game element's Y-position-values to offset against the borders...
-	our $W-OFFSET	= 0;			# offset for the renderer: add this to all game element's X-position-values to offset against the borders...
+	our $ABS-HEIGHT	= $h;				# absolute height
+	our $ABS-WIDTH	= $w;				# absolute width
+	our $HEIGHT	= $ABS-HEIGHT - 2 - 1;		# height of the game board for the game logic; -2 for the top and bottom status lines, -1 because the game board is 0-indexed, but the ABS-HEIGHT isn't: to make 0 out of 1 you go 1-1, to make game-board-height out of height you go height-1
+	our $WIDTH	= ($ABS-WIDTH div 2) - 1;	# width of the game board for the game logic... div 2 cause of a renderer peculiarity, -1 cause 0-indexed game board, as above
+	our $H-OFFSET	= 1;				# offset for the renderer: add this to all game element's Y-position-values to offset against the borders...
+	our $W-OFFSET	= 0;				# offset for the renderer: add this to all game element's X-position-values to offset against the borders...
 	our @PLAYERS	= [];
 	our @FOODS	= [];
 

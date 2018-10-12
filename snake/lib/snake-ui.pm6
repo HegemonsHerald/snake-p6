@@ -271,6 +271,8 @@ class Middle is Window is export {
 				@welcome-screen-message = @message;
 				last;
 			}
+
+			@welcome-screen-message = [ "" ]
 		}
 
 		# Find the starting position for drawing the message's parts
