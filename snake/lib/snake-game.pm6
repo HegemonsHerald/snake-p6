@@ -33,7 +33,7 @@ class Snake {
 	has $.game-over is rw = False;
 	has $.score is rw;
 	has $.direction;
-	has $.growth = 0;
+	has $.growth = 10;
 
 	# Creation shorthand
 	method create {
@@ -89,6 +89,8 @@ class Snake {
 		# Calculate new speed in seconds
 		sub new-speed {
 
+			#$.speed += 5;
+			#return 1 / $.speed
 			# for every 5 score points increase the speed by 0.1 seconds between ticks
 			return ( 1 - ( ($.score / 5).floor / 10 ) )
 		}
@@ -375,7 +377,8 @@ sub max-score {
 # Render Function Wrapper
 sub render {
 	unless $GAME-OVER {
-		snake-ui::render-game(@WINDOWS, @PLAYERS, @FOODS);
+		#snake-ui::render-game(@WINDOWS, @PLAYERS, @FOODS);
+		say-snake;
 	}
 
 	# Note: the *GAME-OVER check here is necessary, cause the check
@@ -391,7 +394,7 @@ sub render {
 sub game-start is export {
 
 	# Render the initial screen
-	welcome-screen(@WINDOWS, $SETTINGS.high-score);
+	#welcome-screen(@WINDOWS, $SETTINGS.high-score);
 
 }
 
@@ -469,7 +472,7 @@ sub start-up ($height, $width, $speed, $length, $worth, $growth, $start-directio
 	if $w % 2 == 1 {
 		$w--
 	}
-	
+
 
 	# Init thingies
 	our $ABS-HEIGHT	= $h;				# absolute height
@@ -483,11 +486,14 @@ sub start-up ($height, $width, $speed, $length, $worth, $growth, $start-directio
 
 	our $SETTINGS	= Settings.create($speed, $length, $worth, $growth, $start-direction);
 
-	# Let's make some windows...
-	# ...			  	height	   		width       	y			x
-	@WINDOWS.push: Top.new(		1,			$ABS-WIDTH,	0,			0,	"SNAKE!!!",	max-score);	# ... top bar
-	@WINDOWS.push: Middle.new(	$ABS-HEIGHT - 2,	$ABS-WIDTH,	1,			0);					# ... game board
-	@WINDOWS.push: Bottom.new(	1,			$ABS-WIDTH,	$ABS-HEIGHT - 1,	0,	max-score);			# ... bottom bar
+#
+#	# Let's make some windows...
+#	# ...			  	height	   		width       	y			x
+#	@WINDOWS.push: Top.new(		1,			$ABS-WIDTH,	0,			0,	"SNAKE!!!",	max-score);	# ... top bar
+#	@WINDOWS.push: Middle.new(	$ABS-HEIGHT - 2,	$ABS-WIDTH,	1,			0);					# ... game board
+#	@WINDOWS.push: Bottom.new(	1,			$ABS-WIDTH,	$ABS-HEIGHT - 1,	0,	max-score);			# ... bottom bar
+#
+#
 
 	# run the game!
 	game-start;
