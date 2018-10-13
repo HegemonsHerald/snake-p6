@@ -27,11 +27,22 @@ class Point {
 # Snake Movement Direction
 enum Direction is export <Up Down Left Right>;
 
+# A Timer that moves a Snake
 class Timer {
+
+	# A timer holds a reference to its player, so it can call its .move method.
+	#
+	# Explanation of the Speed Change System:
+	# The Settings object holds a field: speed-change-interval.
+	# The timer holds a field: speed-counter.
+	# Whenever the speed-counter lacks behind the timer's player's score by the value in speed-change-interval, (player.score - settings.speed-change-interval == timer.speed-counter)
+	# the timer will increase the player's speed.
+	# ... so, whenever a player has made speed-change-interval many points, the speed will increase by 0.1 seconds/tick
 
 	has $.parent-player;
 	has $.meta-supplier;
 	has $.speed-counter is rw = -1;
+	has $.current-speed is rw = $SETTINGS.start-speed;
 
 	method new ($parent-player) {
 
@@ -48,23 +59,23 @@ class Timer {
 		# .say on a supply-block executes the code, so the supplies,
 		# that are returned from this tap are executed
 
-		# Kickoff a first interval, with the default speed
-
 		Promise.start({
-			say "start promise";
 
 			while !$GAME-OVER {
 
 				# If speed-counter is in initial state, kick off the intervall
 				if $.speed-counter == -1 {
-					self.change-interval($SETTINGS.start-speed);
+					self.change-interval;
 					$.speed-counter = 0;
 
 				# If the score has increased by 5
 				} elsif $.speed-counter == ( $.parent-player.score - $SETTINGS.speed-change-interval ) {
 
 					# Set a new interval speed
-					self.change-interval(self.new-speed);
+					$.current-speed = self.new-speed;
+
+					# Update the interval
+					self.change-interval;
 
 					# And update the counter
 					$.speed-counter = $.parent-player.score
@@ -82,11 +93,11 @@ class Timer {
 	}
 
 	# A function to change the speed of the movement interval
-	method change-interval($n) {
+	method change-interval {
 
 		# Emit a new interval supply
 		$.meta-supplier.emit( supply {
-			whenever Supply.interval($n) -> $v {
+			whenever Supply.interval($.current-speed) -> $v {
 				$.parent-player.move;
 				render;
 			}
@@ -103,7 +114,7 @@ class Timer {
 
 	# Calculate speed in seconds
 	method new-speed {
-		return ( $SETTINGS.start-speed - ( ($.parent-player.score / $SETTINGS.speed-change-interval).floor / 10 ) )
+		return ( $.current-speed - 0.1 )
 	}
 
 }
