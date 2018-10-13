@@ -57,12 +57,3 @@ sub MAIN(Int $height=0, Int $width=0) {
 # Potential Multi-Player:
 # Put the Message-Generation Logic for High-Score and the Player-Score Displays in the players themselves, have the players have an ID or a name...
 # Then you can go: player 3:  SCORE | player 2: SCORE etc
-
-#
-# 0. Put the welcome text messages in Package Wide variables
-# 1. Make the welcome-screen thing print the SNAKE! and a please press any key message
-# 2. Add a getch to wait for any key press
-# 3. Make the text appear centered
-# 4. Add a welcome text that's smaller, for if the window isn't quite so wide
-# 5. Add another even smaller one
-# 6. Add another, empty one
