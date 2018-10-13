@@ -239,10 +239,10 @@ class Snake {
 
 		# Check in which direction to move
 		given $dir {
-			when Up {	$y--; if $y == -1	{ $y = $HEIGHT } }
-			when Down {	$y++; if $y == $HEIGHT	{ $y = 0 } }
+			when Up {	$y--; if $y == -1	{ $y = $HEIGHT -1 } }	# $HEIGHT -1 because $HEIGHT is the number of lines, not the index of the last line (ncurses windows are 0-indexed, but $HEIGHT counts the number of lines, which makes it 1-indexed)
+			when Down {	$y++; if $y == $HEIGHT	{ $y = 0 } }		#										    ($HEIGHT = lines.elems, we want to move to lines[$HEIGHT -1], cause $HEIGHT -1 == lines.elems -1)
 			when Right {	$x++; if $x == $WIDTH	{ $x = 0 } }
-			when Left {	$x--; if $x == -1	{ $x = $WIDTH } }
+			when Left {	$x--; if $x == -1	{ $x = $WIDTH -1 } }	# $WIDTH -1 for same reason as above with $HEIGHT
 		}
 
 		# Return the new head's point
@@ -407,7 +407,6 @@ sub max-score {
 sub render {
 	unless $GAME-OVER {
 		snake-ui::render-game(@WINDOWS, @PLAYERS, @FOODS);
-		#say-snake;
 	}
 
 	# Note: the *GAME-OVER check here is necessary, cause the check
@@ -456,7 +455,7 @@ sub game is export {
 			# 108 = l, 261 = right_arrow
 			when 108 | KEY_RIGHT {	@PLAYERS[0].move(Right); render }
 
-			default { say $input }
+			#default { say $input }
 		}
 
 	}
@@ -506,8 +505,8 @@ sub start-up ($height, $width, $speed, $interval, $length, $worth, $growth, $sta
 	# Init thingies
 	our $ABS-HEIGHT	= $h;				# absolute height
 	our $ABS-WIDTH	= $w;				# absolute width
-	our $HEIGHT	= $ABS-HEIGHT - 2 - 1;		# height of the game board for the game logic; -2 for the top and bottom status lines, -1 because the game board is 0-indexed, but the ABS-HEIGHT isn't: to make 0 out of 1 you go 1-1, to make game-board-height out of height you go height-1
-	our $WIDTH	= ($ABS-WIDTH div 2) - 1;	# width of the game board for the game logic... div 2 cause of a renderer peculiarity, -1 cause 0-indexed game board, as above
+	our $HEIGHT	= $ABS-HEIGHT - 2;		# height of the game board for the game logic; -2 for the top and bottom status lines
+	our $WIDTH	= $ABS-WIDTH div 2;		# width of the game board for the game logic... div 2 cause of a renderer peculiarity
 	our $H-OFFSET	= 1;				# offset for the renderer: add this to all game element's Y-position-values to offset against the borders...
 	our $W-OFFSET	= 0;				# offset for the renderer: add this to all game element's X-position-values to offset against the borders...
 	our @PLAYERS	= [];
