@@ -1,103 +1,109 @@
-unit module snake-game;
+#!/bin/perl6
+use v6;
 
-use snake-ui;
-use NCurses;
-use NativeCall;
-
+# Declare Global Variables (assignment in MAIN function)
 our $HEIGHT;
 our $WIDTH;
 our $GAME-OVER;
+our $SETTINGS;
 our @PLAYERS;
 our @FOODS;
-our $SETTINGS;
-our @WINDOWS;
 
-
-# *****************************************************************************
-# GAME LOGIC
 
 # Class Definitions
 
 # Points for the segments of the snake
 class Point {
-	has $.x is rw;
-	has $.y is rw;
+	has $.x;
+	has $.y;
 }
 
 # Snake Movement Direction
-enum Direction is export <Up Down Left Right>;
+enum Direction <Up Down Left Right>;
 
 class Timer {
 
+	has $.parent-player;
 	has $.meta-supplier;
 	has $.speed-counter is rw = 0;
 
-	method new () {
+	method new ($parent-player) {
 
 		# A supplier to supply the interval supplies
 		my $meta-supplier = Supplier.new;
 
-		self.bless(:$meta-supplier);
+		self.bless(:$parent-player, :$meta-supplier);
 	}
 
-#	method start {
-#
-#		# For each thing (*) coming from $meta-supplier do: .say
-#		$.meta-supplier.Supply.migrate.tap: *.say;
-#		# .say on a supply-block executes the code, so the supplies,
-#		# that are returned from this tap are executed
-#
-#		# Kickoff a first interval, with the default speed
-#
-#		Promise.start({
-#
-#			while !$GAME-OVER {
-#
-#				if $.speed-counter == 0 {
-#					self.change-interval($SETTINGS.start-speed);
-#					$.speed-counter = 1;
-#
-#				} elsif $.speed-counter <= ($.parent-player.score - 5) {
-#
-#					self.change-interval(self.new-speed);
-#					$.speed-counter = $.parent-player.score;
-#
-#				}
-#			}
-#
-#			if $GAME-OVER {
-#
-#				$.meta-supplier.done;
-#
-#			}
-#		})
-#
-#	}
-#
-#	# A function to change the speed of the movement interval
-#	method change-interval($n) {
-#
-#		# Emit a new interval supply
-#		$.meta-supplier.emit( supply {
-#			whenever Supply.interval($n) -> $v {
-#				$.parent-player.move;
-#				render;
-#			}
-#
-#			# Note: You have to use whenever or .act here,
-#			# because if the handler isn't run single-threaded it
-#			# doesn't work for some reason...
-#			# Also, the supply handler has to be defined in
-#			# this supply-block, because outside it the handler
-#			# would only run on one of the supplies coming down
-#			# $meta-handler's tap!
-#		})
-#	}
-#
-#	# Calculate speed in seconds
-#	method new-speed {
-#		return ( 1 - ( ($.parent-player.score / 5).floor / 10 ) )
-#	}
+	method start {
+
+		# For each thing (*) coming from $meta-supplier do: .say
+		$.meta-supplier.Supply.migrate.tap: *.say;
+		# .say on a supply-block executes the code, so the supplies,
+		# that are returned from this tap are executed
+
+		# Kickoff a first interval, with the default speed
+
+		Promise.start({
+			say "start promise";
+
+			while !$GAME-OVER {
+
+				sleep 0.5;
+
+				if $.speed-counter == 0 {
+					self.change-interval($SETTINGS.start-speed);
+					$.speed-counter = 1;
+				} elsif $.speed-counter > 5 {
+					self.change-interval(0.1)
+				} elsif $.speed-counter > 10 {
+					self.change-interval(0.0001)
+				}
+				$.speed-counter++;
+
+
+				#} elsif $.speed-counter <= ($.parent-player.score - 5) {
+
+				#	self.change-interval(self.new-speed);
+				#	$.speed-counter = $.parent-player.score;
+
+				#}
+			}
+
+			if $GAME-OVER {
+
+				$.meta-supplier.done;
+
+			}
+		})
+
+	}
+
+	# A function to change the speed of the movement interval
+	method change-interval($n) {
+
+		# Emit a new interval supply
+		$.meta-supplier.emit( supply {
+			whenever Supply.interval($n) -> $v {
+				#$.parent-player.move;
+				#render;
+				say "$.speed-counter	oka"
+			}
+
+			# Note: You have to use whenever or .act here,
+			# because if the handler isn't run single-threaded it
+			# doesn't work for some reason...
+			# Also, the supply handler has to be defined in
+			# this supply-block, because outside it the handler
+			# would only run on one of the supplies coming down
+			# $meta-handler's tap!
+		})
+	}
+
+	# Calculate speed in seconds
+	method new-speed {
+		return ( 1 - ( ($.parent-player.score / 5).floor / 10 ) )
+	}
 
 	# Motion Timer
 #	method timer {
@@ -132,15 +138,13 @@ class Timer {
 #		})
 #	}
 }
-
 # Snake object
 class Snake {
-	has @.segments is rw;
+	has @.segments;
 	has $.game-over is rw = False;
 	has $.score is rw;
 	has $.direction;
 	has $.growth = 10;
-	has $.timer;
 
 	# Creation shorthand
 	method create {
@@ -163,13 +167,12 @@ class Snake {
 		self.new(segments => @start-points, score => $SETTINGS.start-score, direction => $SETTINGS.start-direction);
 	}
 
+	# Motion Timer
 	method timer {
-		$.timer = Timer.new();
-		say "oka";
-		$.timer.start;
-
+		say "whee";
+		my $timer = Timer.new(self);
+		$timer.start
 	}
-
 
 	# Move in previous direction
 	multi method move() {
@@ -255,10 +258,16 @@ class Snake {
 
 		# Check in which direction to move
 		given $dir {
-			when Up {	$y--; if $y == -1	{ $y = $HEIGHT } }
-			when Down {	$y++; if $y == $HEIGHT	{ $y = 0 } }
-			when Right {	$x++; if $x == $WIDTH	{ $x = 0 } }
-			when Left {	$x--; if $x == -1	{ $x = $WIDTH } }
+			when Up {
+				$y--;
+				# TODO I don't know, whether ncurses screens are zero-indexed or one-indexed
+				if $y == 0 {
+					$y = $HEIGHT;
+				}
+			}
+			when Down { $y++; if $y == $HEIGHT { $y=0 } }
+			when Right { $x++; if $x == $WIDTH { $x=0 } }
+			when Left { $x--; if $x == 0 { $x=$WIDTH } }
 		}
 
 		# Return the new head's point
@@ -323,7 +332,7 @@ class Food {
 
 	# Make a new food poin
 	method new {
-		my $position = self!point;
+		 my $position = self!point;
 		return self.bless(:$position)
 	}
 
@@ -371,7 +380,6 @@ class Settings {
 }
 
 
-# *****************************************************************************
 # Function Definitions
 
 # Make the Snake(s) move
@@ -379,6 +387,31 @@ sub init-timers {
 	for @PLAYERS -> $player {
 		$player.timer
 	}
+}
+
+# Render Function
+sub render {
+	unless $GAME-OVER {
+		say-snake
+	}
+
+	# Note: the GAME-OVER check here is necessary, cause the check
+	# in the timer sub sometimes gets the timing wrong and makes a
+	# recursive call, even though GAME-OVER over is set within a
+	# millisecond or so. In that case another render is kicked off
+	# that may interfere with the game-over() subroutine, unless I
+	# check for GAME-OVER at every position a render update is
+	# made!
+}
+
+# Function that draws the initial Screen
+sub game-start {
+	say "SNAKE! To play please press any button";
+}
+
+# Function that wraps up the Game upon Game Over Condition
+sub game-over {
+	say "Game Over";
 }
 
 # Function that checks how many fields of the game board are filled with Snake segments
@@ -398,6 +431,8 @@ sub board-filled {
 	return False
 }
 
+
+# **** TEMP ****
 # Function to output the current snake segments
 sub say-snake {
 	print "|";
@@ -409,140 +444,84 @@ sub say-snake {
 	print "		@PLAYERS[0].score()	@PLAYERS[0].growth()\n";
 }
 
-# Function to calculate the maximally possible score
-sub max-score {
-	return ( $HEIGHT * $WIDTH - $SETTINGS.start-length ) * $SETTINGS.points-worth
-}
-
-# *****************************************************************************
-# Game State Functions and API Functions
 
 
-# Render Function Wrapper
-sub render {
-	unless $GAME-OVER {
-		#snake-ui::render-game(@WINDOWS, @PLAYERS, @FOODS);
-		#say-snake;
-		say "Int boom";
-	}
+# Run
 
-	# Note: the *GAME-OVER check here is necessary, cause the check
-	# in the timer sub sometimes gets the timing wrong and makes a
-	# recursive call, even though *GAME-OVER over is set within a
-	# millisecond or so. In that case another render is kicked off
-	# that may interfere with the game-over() subroutine, unless I
-	# check for *GAME-OVER at every position a render update is
-	# made!
-}
+# Get command line arguments and start the game
 
-# Start the Game
-sub game-start is export {
+sub MAIN(Int $height=80, Int $width=10) {
 
-	# Render the initial screen
-	#welcome-screen(@WINDOWS, $SETTINGS.high-score);
+	# Setup
 
-}
+	# Assign Global Variables
+	our $HEIGHT = $height;
+	our $WIDTH = $width;
 
-# Run the Game
-sub game is export {
-
-	# Setup Game Logic things...
-	our @PLAYERS.push: Snake.create();
-	our @FOODS.push: Food.new();
-
-	# Start the motions!
-	init-timers;
-
-	# While the Game's running
-	while !$GAME-OVER {
-
-		# Wait for input
-		my $input = getch;
-
-		given $input {
-			# 104 = h, 260 = left_arrow
-			when 104 | KEY_LEFT {	@PLAYERS[0].move(Left); render }
-
-			# 106 = j, 258 = down_arrow
-			when 106 | KEY_DOWN {	@PLAYERS[0].move(Down); render }
-
-			# 107 = k, 259 = up_arrow
-			when 107 | KEY_UP {	@PLAYERS[0].move(Up); render }
-
-			# 108 = l, 261 = right_arrow
-			when 108 | KEY_RIGHT {	@PLAYERS[0].move(Right); render }
-
-			default { say $input }
-		}
-
-	}
-}
-
-# On Game Over
-sub game-over is export {
-
-	# Render the game over screen
-	game-over-screen(@WINDOWS, $HEIGHT, $WIDTH, $SETTINGS.high-score);
-
-}
-
-# Kickoff!
-sub start-up ($height, $width, $speed, $length, $worth, $growth, $start-direction) is export {
-
-	# Init NCurses
-	our @WINDOWS	= [];
-	@WINDOWS.push: ui-init;
-
-	# These have to be globally scoped for the execution of the entire game...
-	curs_set(0);
-	start_color;
-	use_default_colors;
-	init_pair(COLOR_PAIR_1, COLOR_BLUE, COLOR_YELLOW);
-	init_pair(COLOR_PAIR_2, COLOR_BLUE, -1);
-
-	# Make window size decisions
-	my ($h, $w) = $height, $width;
-	my $y = getmaxy(@WINDOWS[0]);
-	my $x = getmaxx(@WINDOWS[0]);
+	# Init settings object
+	# Note: currently the Snake is initialized with its head on center and the body to its left,
+	# so it can start moving in any direction except left!
+	our $SETTINGS = Settings.create(0.5, 5, 1, 3, Right);
 	
-	if $height == 0 {
-		$h = $y;
-	}
+	# Init the Ncurses Buffers
 
-	if $width == 0 {
-		$w = $x;
-	}
-
-	# Make sure the width is evenly divisible (cause game logic runs at half-width of render-logic)
-	if $w % 2 == 1 {
-		$w--
-	}
-
-
-	# Init thingies
-	our $ABS-HEIGHT	= $h;				# absolute height
-	our $ABS-WIDTH	= $w;				# absolute width
-	our $HEIGHT	= $ABS-HEIGHT - 2 - 1;		# height of the game board for the game logic; -2 for the top and bottom status lines, -1 because the game board is 0-indexed, but the ABS-HEIGHT isn't: to make 0 out of 1 you go 1-1, to make game-board-height out of height you go height-1
-	our $WIDTH	= ($ABS-WIDTH div 2) - 1;	# width of the game board for the game logic... div 2 cause of a renderer peculiarity, -1 cause 0-indexed game board, as above
-	our $H-OFFSET	= 1;				# offset for the renderer: add this to all game element's Y-position-values to offset against the borders...
-	our $W-OFFSET	= 0;				# offset for the renderer: add this to all game element's X-position-values to offset against the borders...
-	our @PLAYERS	= [];
-	our @FOODS	= [];
-
-	our $SETTINGS	= Settings.create($speed, $length, $worth, $growth, $start-direction);
-
-#
-#	# Let's make some windows...
-#	# ...			  	height	   		width       	y			x
-#	@WINDOWS.push: Top.new(		1,			$ABS-WIDTH,	0,			0,	"SNAKE!!!",	max-score);	# ... top bar
-#	@WINDOWS.push: Middle.new(	$ABS-HEIGHT - 2,	$ABS-WIDTH,	1,			0);					# ... game board
-#	@WINDOWS.push: Bottom.new(	1,			$ABS-WIDTH,	$ABS-HEIGHT - 1,	0,	max-score);			# ... bottom bar
-#
-#
-
-	# run the game!
 	game-start;
+
+	# Execution
 	game;
+
+	# Await game-over Input (Restart or Quit events)
 	game-over;
 }
+
+sub game {
+
+	# Init players
+	our @PLAYERS = [ Snake.create() ];
+
+	# Init foods
+	our @FOODS = [ Food.new() ];
+
+	# Kick off rendering
+	render;
+
+	# Init timers
+	init-timers;
+
+	# Start reading Keyboard Events for player1
+	# my $supplier = Supplier.new;
+	# my $supply = $supplier.Supply;
+	# $supply.tap( -> $v { say "$v" });
+
+	# sub key-listener(Supplier $sup) {
+	# 	my $async = Promise.start({
+	# 		loop {
+	# 			$sup.emit(get)
+	# 		}
+	# 	});
+	# }
+
+	# key-listener($supplier);
+
+	# so here's the plan for the key-listener:
+	# listen to all revant keys by default, depending on what context you're in,
+	# change the behaviour of the the supplied... → you can just create the supplies for
+	# the motion keys in the game functions and let them (and thereby the handling-behaviour)
+	# go out of scope with the game's end!
+
+
+	while !$GAME-OVER {}
+}
+
+
+# TODO
+# test growth and scoring
+# impl and test start speed and speed increase lambda
+# make private what can be private
+# go for the rendering!
+
+# WHEN I'M DONE WITH THIS
+# I should draw out the structure of this program and see how spaghetti it really
+# is... That would also teach me how to refactor it -- and how to modularize it!
+
 
