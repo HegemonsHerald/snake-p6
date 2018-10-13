@@ -49,7 +49,7 @@ sub MAIN(Int $height=0, Int $width=0) {
 	if 0 < $width < 10 { $start-length = 1 }
 
 	# Do the game bit!
-	start-up($height, $width, 0.5, $start-length, 1, 3, Right)
+	start-up($height, $width, 0.5, 3, $start-length, 1, 3, Right)
 
 }
 

@@ -7,9 +7,9 @@ use NativeCall;
 our $HEIGHT;
 our $WIDTH;
 our $GAME-OVER;
+our $SETTINGS;
 our @PLAYERS;
 our @FOODS;
-our $SETTINGS;
 our @WINDOWS;
 
 
@@ -61,7 +61,7 @@ class Timer {
 					$.speed-counter = 0;
 
 				# If the score has increased by 5
-				} elsif $.speed-counter == ( $.parent-player.score - 5 ) {
+				} elsif $.speed-counter == ( $.parent-player.score - $SETTINGS.speed-change-interval ) {
 
 					# Set a new interval speed
 					self.change-interval(self.new-speed);
@@ -89,8 +89,6 @@ class Timer {
 			whenever Supply.interval($n) -> $v {
 				$.parent-player.move;
 				render;
-				my $s = $.parent-player.score;
-				say "$.speed-counter	$s	$n	oka"
 			}
 
 			# Note: You have to use whenever or .act here,
@@ -105,7 +103,7 @@ class Timer {
 
 	# Calculate speed in seconds
 	method new-speed {
-		return ( $SETTINGS.start-speed - ( ($.parent-player.score / 5).floor / 10 ) )
+		return ( $SETTINGS.start-speed - ( ($.parent-player.score / $SETTINGS.speed-change-interval).floor / 10 ) )
 	}
 
 }
@@ -333,15 +331,16 @@ class Food {
 # Settings object
 class Settings {
 	has $.high-score;
-	has $.start-speed;	# How fast a snake is at the start, in delta seconds between ticks
-	has $.start-score;	# How many points a snake has at the start
-	has $.start-length;	# How long a snake is at the start
-	has $.start-direction;	# Which direction a snake starts in
-	has $.points-worth;	# How much a food point is worth in score
-	has $.growth-rate;	# How many segments a snake grows per food point
+	has $.start-speed;		# How fast a snake is at the start, in delta seconds between ticks
+	has $.speed-change-interval;	# How many points a player has to make, til he gets a speed increase
+	has $.start-score;		# How many points a snake has at the start
+	has $.start-length;		# How long a snake is at the start
+	has $.start-direction;		# Which direction a snake starts in
+	has $.points-worth;		# How much a food point is worth in score
+	has $.growth-rate;		# How many segments a snake grows per food point
 
-	method create ($start-speed, $start-length, $points-worth, $growth-rate, $start-direction) {
-		self.bless(high-score => 0, start-score => 0, :$start-speed, :$start-length, :$points-worth, :$growth-rate, :$start-direction)
+	method create ($start-speed, $speed-change-interval, $start-length, $points-worth, $growth-rate, $start-direction) {
+		self.bless(high-score => 0, start-score => 0, :$start-speed, :$speed-change-interval, :$start-length, :$points-worth, :$growth-rate, :$start-direction)
 	}
 }
 
@@ -461,7 +460,7 @@ sub game-over is export {
 }
 
 # Kickoff!
-sub start-up ($height, $width, $speed, $length, $worth, $growth, $start-direction) is export {
+sub start-up ($height, $width, $speed, $interval, $length, $worth, $growth, $start-direction) is export {
 
 	# Init NCurses
 	our @WINDOWS	= [];
@@ -503,7 +502,7 @@ sub start-up ($height, $width, $speed, $length, $worth, $growth, $start-directio
 	our @PLAYERS	= [];
 	our @FOODS	= [];
 
-	our $SETTINGS	= Settings.create($speed, $length, $worth, $growth, $start-direction);
+	our $SETTINGS	= Settings.create($speed, $interval, $length, $worth, $growth, $start-direction);
 
 
 	# Let's make some windows...

@@ -82,7 +82,6 @@ class Timer {
 			whenever Supply.interval($n) -> $v {
 				$.parent-player.move;
 				render;
-				say "$.speed-counter	$n	oka"
 			}
 
 			# Note: You have to use whenever or .act here,
