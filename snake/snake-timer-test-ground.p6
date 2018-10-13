@@ -49,25 +49,20 @@ class Timer {
 
 			while !$GAME-OVER {
 
-				sleep 0.5;
-
+				# so, we are definitely reaching the maximum speed increase at 0.1 seconds... I should change this to a delta time code implementation...
+				# If the score has increased by 5
 				if $.speed-counter == 0 {
 					self.change-interval($SETTINGS.start-speed);
 					$.speed-counter = 1;
-				} elsif $.speed-counter > 5 {
-					self.change-interval(0.1)
-				} elsif $.speed-counter > 10 {
-					self.change-interval(0.0001)
+				} elsif $.speed-counter == ( $.parent-player.score - 5 ) {
+
+					# Set a new interval speed
+					self.change-interval(self.new-speed);
+
+					# And update the counter
+					$.speed-counter = $.parent-player.score
 				}
-				$.speed-counter++;
 
-
-				#} elsif $.speed-counter <= ($.parent-player.score - 5) {
-
-				#	self.change-interval(self.new-speed);
-				#	$.speed-counter = $.parent-player.score;
-
-				#}
 			}
 
 			if $GAME-OVER {
@@ -85,9 +80,9 @@ class Timer {
 		# Emit a new interval supply
 		$.meta-supplier.emit( supply {
 			whenever Supply.interval($n) -> $v {
-				#$.parent-player.move;
-				#render;
-				say "$.speed-counter	oka"
+				$.parent-player.move;
+				render;
+				say "$.speed-counter	$n	oka"
 			}
 
 			# Note: You have to use whenever or .act here,
@@ -102,42 +97,11 @@ class Timer {
 
 	# Calculate speed in seconds
 	method new-speed {
-		return ( 1 - ( ($.parent-player.score / 5).floor / 10 ) )
+		return ( $SETTINGS.start-speed - ( ($.parent-player.score / 5).floor / 10 ) )
 	}
 
-	# Motion Timer
-#	method timer {
-#
-#
-#		# Counter, that holds the score of the last speed change
-#		my $speed-counter = 0;
-#
-#		# Change the speed concurrently
-#		Promise.start({
-#
-#			# Only while the game is running
-#			while !$GAME-OVER {
-#
-#				# If the score has increased by 5
-#				if $speed-counter <= ($.score - 5) {
-#
-#					# Set a new interval speed
-#					change-interval(new-speed);
-#
-#					# And update the counter
-#					$speed-counter = $.score
-#				}
-#			}
-#
-#			# If the Game has ended
-#			if $GAME-OVER {
-#
-#				# Quit the interval, just to be sure... the supply and supplier go out of scope here anyways
-#				$meta-supplier.done;
-#			}
-#		})
-#	}
 }
+
 # Snake object
 class Snake {
 	has @.segments;

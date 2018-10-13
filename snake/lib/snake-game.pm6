@@ -29,108 +29,85 @@ enum Direction is export <Up Down Left Right>;
 
 class Timer {
 
+	has $.parent-player;
 	has $.meta-supplier;
-	has $.speed-counter is rw = 0;
+	has $.speed-counter is rw = -1;
 
-	method new () {
+	method new ($parent-player) {
 
 		# A supplier to supply the interval supplies
 		my $meta-supplier = Supplier.new;
 
-		self.bless(:$meta-supplier);
+		self.bless(:$parent-player, :$meta-supplier);
 	}
 
-#	method start {
-#
-#		# For each thing (*) coming from $meta-supplier do: .say
-#		$.meta-supplier.Supply.migrate.tap: *.say;
-#		# .say on a supply-block executes the code, so the supplies,
-#		# that are returned from this tap are executed
-#
-#		# Kickoff a first interval, with the default speed
-#
-#		Promise.start({
-#
-#			while !$GAME-OVER {
-#
-#				if $.speed-counter == 0 {
-#					self.change-interval($SETTINGS.start-speed);
-#					$.speed-counter = 1;
-#
-#				} elsif $.speed-counter <= ($.parent-player.score - 5) {
-#
-#					self.change-interval(self.new-speed);
-#					$.speed-counter = $.parent-player.score;
-#
-#				}
-#			}
-#
-#			if $GAME-OVER {
-#
-#				$.meta-supplier.done;
-#
-#			}
-#		})
-#
-#	}
-#
-#	# A function to change the speed of the movement interval
-#	method change-interval($n) {
-#
-#		# Emit a new interval supply
-#		$.meta-supplier.emit( supply {
-#			whenever Supply.interval($n) -> $v {
-#				$.parent-player.move;
-#				render;
-#			}
-#
-#			# Note: You have to use whenever or .act here,
-#			# because if the handler isn't run single-threaded it
-#			# doesn't work for some reason...
-#			# Also, the supply handler has to be defined in
-#			# this supply-block, because outside it the handler
-#			# would only run on one of the supplies coming down
-#			# $meta-handler's tap!
-#		})
-#	}
-#
-#	# Calculate speed in seconds
-#	method new-speed {
-#		return ( 1 - ( ($.parent-player.score / 5).floor / 10 ) )
-#	}
+	method start {
 
-	# Motion Timer
-#	method timer {
-#
-#
-#		# Counter, that holds the score of the last speed change
-#		my $speed-counter = 0;
-#
-#		# Change the speed concurrently
-#		Promise.start({
-#
-#			# Only while the game is running
-#			while !$GAME-OVER {
-#
-#				# If the score has increased by 5
-#				if $speed-counter <= ($.score - 5) {
-#
-#					# Set a new interval speed
-#					change-interval(new-speed);
-#
-#					# And update the counter
-#					$speed-counter = $.score
-#				}
-#			}
-#
-#			# If the Game has ended
-#			if $GAME-OVER {
-#
-#				# Quit the interval, just to be sure... the supply and supplier go out of scope here anyways
-#				$meta-supplier.done;
-#			}
-#		})
-#	}
+		# For each thing (*) coming from $meta-supplier do: .say
+		$.meta-supplier.Supply.migrate.tap: *.say;
+		# .say on a supply-block executes the code, so the supplies,
+		# that are returned from this tap are executed
+
+		# Kickoff a first interval, with the default speed
+
+		Promise.start({
+			say "start promise";
+
+			while !$GAME-OVER {
+
+				# If speed-counter is in initial state, kick off the intervall
+				if $.speed-counter == -1 {
+					self.change-interval($SETTINGS.start-speed);
+					$.speed-counter = 0;
+
+				# If the score has increased by 5
+				} elsif $.speed-counter == ( $.parent-player.score - 5 ) {
+
+					# Set a new interval speed
+					self.change-interval(self.new-speed);
+
+					# And update the counter
+					$.speed-counter = $.parent-player.score
+				}
+
+			}
+
+			if $GAME-OVER {
+
+				$.meta-supplier.done;
+
+			}
+		})
+
+	}
+
+	# A function to change the speed of the movement interval
+	method change-interval($n) {
+
+		# Emit a new interval supply
+		$.meta-supplier.emit( supply {
+			whenever Supply.interval($n) -> $v {
+				$.parent-player.move;
+				render;
+				my $s = $.parent-player.score;
+				say "$.speed-counter	$s	$n	oka"
+			}
+
+			# Note: You have to use whenever or .act here,
+			# because if the handler isn't run single-threaded it
+			# doesn't work for some reason...
+			# Also, the supply handler has to be defined in
+			# this supply-block, because outside it the handler
+			# would only run on one of the supplies coming down
+			# $meta-handler's tap!
+		})
+	}
+
+	# Calculate speed in seconds
+	method new-speed {
+		return ( $SETTINGS.start-speed - ( ($.parent-player.score / 5).floor / 10 ) )
+	}
+
 }
 
 # Snake object
@@ -139,7 +116,7 @@ class Snake {
 	has $.game-over is rw = False;
 	has $.score is rw;
 	has $.direction;
-	has $.growth = 10;
+	has $.growth = 0;
 	has $.timer;
 
 	# Creation shorthand
@@ -164,10 +141,8 @@ class Snake {
 	}
 
 	method timer {
-		$.timer = Timer.new();
-		say "oka";
-		$.timer.start;
-
+		my $timer = Timer.new(self);
+		$timer.start
 	}
 
 
@@ -421,9 +396,8 @@ sub max-score {
 # Render Function Wrapper
 sub render {
 	unless $GAME-OVER {
-		#snake-ui::render-game(@WINDOWS, @PLAYERS, @FOODS);
+		snake-ui::render-game(@WINDOWS, @PLAYERS, @FOODS);
 		#say-snake;
-		say "Int boom";
 	}
 
 	# Note: the *GAME-OVER check here is necessary, cause the check
@@ -439,7 +413,7 @@ sub render {
 sub game-start is export {
 
 	# Render the initial screen
-	#welcome-screen(@WINDOWS, $SETTINGS.high-score);
+	welcome-screen(@WINDOWS, $SETTINGS.high-score);
 
 }
 
@@ -531,14 +505,14 @@ sub start-up ($height, $width, $speed, $length, $worth, $growth, $start-directio
 
 	our $SETTINGS	= Settings.create($speed, $length, $worth, $growth, $start-direction);
 
-#
-#	# Let's make some windows...
-#	# ...			  	height	   		width       	y			x
-#	@WINDOWS.push: Top.new(		1,			$ABS-WIDTH,	0,			0,	"SNAKE!!!",	max-score);	# ... top bar
-#	@WINDOWS.push: Middle.new(	$ABS-HEIGHT - 2,	$ABS-WIDTH,	1,			0);					# ... game board
-#	@WINDOWS.push: Bottom.new(	1,			$ABS-WIDTH,	$ABS-HEIGHT - 1,	0,	max-score);			# ... bottom bar
-#
-#
+
+	# Let's make some windows...
+	# ...			  	height	   		width       	y			x
+	@WINDOWS.push: Top.new(		1,			$ABS-WIDTH,	0,			0,	"SNAKE!!!",	max-score);	# ... top bar
+	@WINDOWS.push: Middle.new(	$ABS-HEIGHT - 2,	$ABS-WIDTH,	1,			0);					# ... game board
+	@WINDOWS.push: Bottom.new(	1,			$ABS-WIDTH,	$ABS-HEIGHT - 1,	0,	max-score);			# ... bottom bar
+
+
 
 	# run the game!
 	game-start;

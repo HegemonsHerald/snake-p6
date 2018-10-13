@@ -333,11 +333,11 @@ sub welcome-screen (@windows, $high-score) is export {
 	$bot.attron(A_BOLD);
 
 	# Make the windows visible
-	@windows all "bkgd";
+	#@windows all "bkgd";
 
 	# Print the Top Bar
-	$top.print-snake-field;
-	$top.print-high-score-field($high-score);
+	#$top.print-snake-field;
+	#$top.print-high-score-field($high-score);
 
 	# Print the Startup Screen aka Welcome Message
 	$mid.print-welcome-message;
