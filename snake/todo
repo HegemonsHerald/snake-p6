@@ -4,6 +4,21 @@
 
 NEXT UP:
 
-	1. backwards motion is handled as a self-collision, but it needs to be ignored instead!
-		- go through the safe-guard code
-		- make it work
+	- fix game-over to power down ncurses
+	- add game-over screen
+
+	- make methods, that can be private, private
+
+	- add retry-code: update High-Score and render High-Score
+
+	- add pause screen
+		- requires the motion intervals to be stopped
+			→ they have a current speed, eh? rename init-timers to start-timers
+			→ have the Timer.pause method add an interval, that just does nothing
+			→ have the Timer.resume method add an interval, that again does the normal things
+		- requires the Timers to be stored in a field upon Snake instantiation
+			→ make it so the $.timer field can remain uninitialized til after the Snake creation
+
+	- snake head with ▲ ▶ ▼ ◀
+
+	- make snake start-direction variable (requires code to create snake in right direction)
