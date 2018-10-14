@@ -26,13 +26,16 @@ use snake-game;
 # /bin/snake.p6
 # /lib/snake-ui.p6
 # /lib/snake-game.p6
-#
-# from snake-game.p6 call snake-ui::render, which takes DYNAMICALLY scoped global player and food and size and settings vars...!
 
 sub MAIN(Int $height=0, Int $width=0) {
 
 	# If $height and $width are equal to 0,
 	# the Game Window will take up the entire screen
+
+	# The minimum height for the game is 3
+	if 0 < $height < 3 {
+		die "The Game Window needs to be at least 3 units high!";
+	}
 
 	# The minimum width for the game is 5
 	if 0 < $width < 5 {
@@ -44,15 +47,18 @@ sub MAIN(Int $height=0, Int $width=0) {
 		die "The Game Window can't be negative, dummy!";
 	}
 
-	# Adjust start length of snake for tiny game boards
+	# Adjust start length and growth rate of snake for tiny game boards
 	my $start-length = 5;
-	if 0 < $width < 10 { $start-length = 1 }
+	my $growth-rate  = 3;
+	if 0 < $width < 10 { 
+		$start-length = 1;
+		$growth-rate  = 1;
+	}
 
 	# Do the game bit!
-	start-up($height, $width, 0.5, 3, $start-length, 1, 3, Right)
+	start-up($height, $width, 0.5, 3, $start-length, 1, $growth-rate, Right)
 
 }
-
 
 # Potential Multi-Player:
 # Put the Message-Generation Logic for High-Score and the Player-Score Displays in the players themselves, have the players have an ID or a name...

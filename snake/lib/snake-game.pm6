@@ -432,6 +432,9 @@ sub game is export {
 	# Start the motions!
 	init-timers;
 
+	sleep 5;
+	#@PLAYERS[0].
+
 	# While the Game's running
 	while !$GAME-OVER {
 
