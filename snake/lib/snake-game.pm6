@@ -124,9 +124,8 @@ class Snake {
 	has @.segments is rw;
 	has $.game-over is rw = False;
 	has $.score is rw;
-	has $.direction;
-	has $.growth = 0;
-	has $.timer;
+	has $.direction is rw;
+	has $.growth is rw = 0;
 
 	# Creation shorthand
 	method create {
@@ -163,14 +162,14 @@ class Snake {
 		# If the motion fails, there is no reason to pop from the tail
 
 			# Unless you want to grow
-			unless $!growth > 0 {
+			unless $.growth > 0 {
 				# Remove a piece from the end of the snake, so it doesn't grow
 				self!pop-tail();
 				return;
 			}
 
 			# If you grew by a piece, you now have to grow less
-			$!growth--;
+			$.growth--;
 
 			return;
 		}
@@ -182,8 +181,16 @@ class Snake {
 	# Move in a specific direction
 	multi method move( Direction $dir ) {
 
-		# Set the direction
-		$!direction = $dir;
+		# Direction Control: the snake can only turn 90 degrees
+		if !self!check-turn($dir) {
+			# say "Uh-oh, that was an illegal turn";
+
+			# Illegal turns are no Game Over event, but just mean nothing happens, so return
+			return
+		}
+
+		# If the new direction isn't illegal, set the direction
+		$.direction = $dir;
 
 		# Move
 		self.move();
@@ -192,23 +199,12 @@ class Snake {
 	# Insert a new segment at the snake's head
 	method !insert-front returns Bool {
 
-		# Get the direction in which to move
-		my $dir = self.direction;
-
-		# Direction Control: the snake can only turn 90 degrees
-		if !self!check-turn($dir) {
-			say "Uh-oh, that was an illegal turn";
-
-			# Illegal turns are no Game Over event, but just mean nothing happens, so return
-			return True;
-		}
-
 		# Compute new position
-		my $point = self!compute-new-point($dir);
+		my $point = self!compute-new-point($.direction);
 
 		# Collision Detection: Is it even possible to insert?
 		if self!collision($point) {
-			say "Uh-oH, that was a collision!";
+			# say "Uh-oH, that was a collision!";
 
 			# Self Collisions mean Game Over
 			return False;
@@ -283,10 +279,10 @@ class Snake {
 				if $.segments[0].x == $food.position.x && $.segments[0].y == $food.position.y {
 
 					# More points
-					$!score += $SETTINGS.points-worth;
+					$.score += $SETTINGS.points-worth;
 
 					# More segments
-					$!growth += $SETTINGS.growth-rate;
+					$.growth += $SETTINGS.growth-rate;
 
 					# New Food
 					$food.next;
