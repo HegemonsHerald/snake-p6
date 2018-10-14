@@ -360,6 +360,7 @@ sub welcome-screen (@windows, $high-score) is export {
 our sub render-game (@windows, @players, @foods) {
 
 	my $mid = @windows[2];
+	my $bot = @windows[3];
 
 	# Clear the game window
 	$mid.clear;
@@ -379,8 +380,14 @@ our sub render-game (@windows, @players, @foods) {
 		}
 	}
 
+	# Render Score Board (bottom bar)
+	$bot.print-score-field(@players[0].score);
+	# NOTE: this would have to be done differently for a multiplayer
+	# Maybe have a score-fields Array in the bottom bar, where each field has a reference to its player...?
+	# Then you could also sort however you please!
 
 	$mid.refresh;
+	$bot.refresh;
 	nc_refresh;
 }
 
