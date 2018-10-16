@@ -29,7 +29,7 @@ class Snake {
 	has $.game-over is rw = False;
 	has $.score is rw;
 	has $.direction;
-	has $.growth = 10;
+	has $.growth = 0;
 
 	# Creation shorthand
 	method create {
@@ -68,8 +68,10 @@ class Snake {
 			# Emit a new interval supply
 			$meta-supplier.emit( supply {
 				whenever Supply.interval($n) -> $v {
-					self.move;
-					render;
+					if !$GAME-OVER {
+						self.move;
+						render;
+					}
 				}
 
 				# Note: You have to use whenever or .act here,
@@ -358,7 +360,20 @@ sub game-start {
 
 # Function that wraps up the Game upon Game Over Condition
 sub game-over {
-	say "Game Over";
+	# Render the game over screen
+	say "oi, game over...";
+	say "oi, press R to restart...";
+	my $input = getch;
+	given $input {
+		when 114 { game }
+		when "q" { endwin }
+	}
+	sleep 3;
+	game;
+	#game-over-screen(@WINDOWS, $HEIGHT, $WIDTH, $SETTINGS.high-score);
+
+	# If the game isn't restarted
+	#endwin
 }
 
 # Function that checks how many fields of the game board are filled with Snake segments
@@ -457,7 +472,29 @@ sub game {
 	# go out of scope with the game's end!
 
 
-	while !$GAME-OVER {}
+	while !$GAME-OVER {
+		# Wait for input
+		my $screen = initscr;
+		my $input = getch;
+		say $input;
+
+		given $input {
+			# 104 = h, 260 = left_arrow
+			when 104 | KEY_LEFT {	@PLAYERS[0].move(Left); render }
+
+			# 106 = j, 258 = down_arrow
+			when 106 | KEY_DOWN {	@PLAYERS[0].move(Down); render }
+
+			# 107 = k, 259 = up_arrow
+			when 107 | KEY_UP {	@PLAYERS[0].move(Up); render }
+
+			# 108 = l, 261 = right_arrow
+			when 108 | KEY_RIGHT {	@PLAYERS[0].move(Right); render }
+
+			#default { say $input }
+		}
+
+	}
 }
 
 

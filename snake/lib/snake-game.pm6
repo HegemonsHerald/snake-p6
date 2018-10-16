@@ -425,15 +425,9 @@ sub game-start is export {
 # Run the Game
 sub game is export {
 
-	our @PLAYERS = [];
-	our @FOODS = [];
-	our $GAME-OVER = False;
-
 	# Setup Game Logic things...
 	our @PLAYERS.push: Snake.create();
 	our @FOODS.push: Food.new();
-	say @PLAYERS;
-	sleep 5;
 
 	# Start the motions!
 	init-timers;
