@@ -98,8 +98,10 @@ class Timer {
 		# Emit a new interval supply
 		$.meta-supplier.emit( supply {
 			whenever Supply.interval($.current-speed) -> $v {
-				$.parent-player.move;
-				render;
+				unless $GAME-OVER {
+					$.parent-player.move;
+					render;
+				}
 			}
 
 			# Note: You have to use whenever or .act here,
@@ -425,12 +427,14 @@ sub game-start is export {
 # Run the Game
 sub game is export {
 
+	our $GAME-OVER = False;
+
 	# Setup Game Logic things...
 	our @PLAYERS.push: Snake.create();
 	our @FOODS.push: Food.new();
 
 	# Start the motions!
-	init-timers;
+	#init-timers;
 
 	# While the Game's running
 	while !$GAME-OVER {
@@ -451,12 +455,10 @@ sub game is export {
 			# 108 = l, 261 = right_arrow
 			when 108 | KEY_RIGHT {	@PLAYERS[0].move(Right); render }
 
-			#default { say $input }
+			default { say $input }
 		}
 
 	}
-
-	if $GAME-OVER {game-over}
 }
 
 # On Game Over
@@ -468,7 +470,7 @@ sub game-over is export {
 	my $input = getch;
 	given $input {
 		when 114 { game }
-		when "q" { endwin }
+		when 113 { endwin }
 	}
 	#game-over-screen(@WINDOWS, $HEIGHT, $WIDTH, $SETTINGS.high-score);
 
