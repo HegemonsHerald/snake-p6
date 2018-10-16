@@ -405,12 +405,12 @@ sub render {
 		snake-ui::render-game(@WINDOWS, @PLAYERS, @FOODS);
 	}
 
-	# Note: the *GAME-OVER check here is necessary, cause the check
+	# Note: the $GAME-OVER check here is necessary, cause the check
 	# in the timer sub sometimes gets the timing wrong and makes a
-	# recursive call, even though *GAME-OVER over is set within a
+	# recursive call, even though $GAME-OVER over is set within a
 	# millisecond or so. In that case another render is kicked off
 	# that may interfere with the game-over() subroutine, unless I
-	# check for *GAME-OVER at every position a render update is
+	# check for $GAME-OVER at every position a render update is
 	# made!
 }
 
@@ -425,15 +425,18 @@ sub game-start is export {
 # Run the Game
 sub game is export {
 
+	our @PLAYERS = [];
+	our @FOODS = [];
+	our $GAME-OVER = False;
+
 	# Setup Game Logic things...
 	our @PLAYERS.push: Snake.create();
 	our @FOODS.push: Food.new();
+	say @PLAYERS;
+	sleep 5;
 
 	# Start the motions!
 	init-timers;
-
-	sleep 5;
-	#@PLAYERS[0].
 
 	# While the Game's running
 	while !$GAME-OVER {
@@ -458,14 +461,25 @@ sub game is export {
 		}
 
 	}
+
+	if $GAME-OVER {game-over}
 }
 
 # On Game Over
 sub game-over is export {
 
 	# Render the game over screen
-	game-over-screen(@WINDOWS, $HEIGHT, $WIDTH, $SETTINGS.high-score);
+	say "oi, game over...";
+	say "oi, press R to restart...";
+	my $input = getch;
+	given $input {
+		when 114 { game }
+		when "q" { endwin }
+	}
+	#game-over-screen(@WINDOWS, $HEIGHT, $WIDTH, $SETTINGS.high-score);
 
+	# If the game isn't restarted
+	#endwin
 }
 
 # Kickoff!
@@ -510,6 +524,7 @@ sub start-up ($height, $width, $speed, $interval, $length, $worth, $growth, $sta
 	our $W-OFFSET	= 0;				# offset for the renderer: add this to all game element's X-position-values to offset against the borders...
 	our @PLAYERS	= [];
 	our @FOODS	= [];
+	our $GAME-OVER  = False;
 
 	our $SETTINGS	= Settings.create($speed, $interval, $length, $worth, $growth, $start-direction);
 
@@ -527,4 +542,3 @@ sub start-up ($height, $width, $speed, $interval, $length, $worth, $growth, $sta
 	game;
 	game-over;
 }
-

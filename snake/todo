@@ -5,6 +5,9 @@
 NEXT UP:
 
 	- fix game-over to power down ncurses
+	   - something with the restarting is going wrong now, and I don't know what
+	   - possible solution: move game logic into its own scope, so the global vars are deallocated on game over (a real proper reset), except for the SETTINGS var and the SIZE vars and shit...
+
 	- add game-over screen
 
 	- make methods, that can be private, private
