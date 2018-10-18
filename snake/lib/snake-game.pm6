@@ -43,6 +43,7 @@ class Timer {
 	has $.meta-supplier;
 	has $.speed-counter is rw = -1;
 	has $.current-speed is rw = $SETTINGS.start-speed;
+	has $.promise is rw = 0;
 
 	method new ($parent-player) {
 
@@ -52,6 +53,7 @@ class Timer {
 		self.bless(:$parent-player, :$meta-supplier);
 	}
 
+	# Start the timer
 	method start {
 
 		# For each thing (*) coming from $meta-supplier do: .say
@@ -59,7 +61,7 @@ class Timer {
 		# .say on a supply-block executes the code, so the supplies,
 		# that are returned from this tap are executed
 
-		Promise.start({
+		$.promise = Promise.start({
 
 			while !$GAME-OVER {
 
@@ -83,13 +85,8 @@ class Timer {
 
 			}
 
-			if $GAME-OVER {
-
-				$.meta-supplier.done;
-
-			}
-		})
-
+			$.meta-supplier.done;
+		});
 	}
 
 	# A function to change the speed of the movement interval
@@ -124,10 +121,10 @@ class Timer {
 # Snake object
 class Snake {
 	has @.segments is rw;
-	has $.game-over is rw = False;
 	has $.score is rw;
 	has $.direction is rw;
 	has $.growth is rw = 0;
+	has $.timer is rw = 0;
 
 	# Creation shorthand
 	method create {
@@ -150,14 +147,20 @@ class Snake {
 		self.new(segments => @start-points, score => $SETTINGS.start-score, direction => $SETTINGS.start-direction);
 	}
 
-	method timer {
-		my $timer = Timer.new(self);
-		$timer.start
+	method start-timer {
+		$.timer = Timer.new(self);
+		$.timer.start
+	}
+
+	method kill-timer {
+		$.timer.kill;
 	}
 
 
 	# Move in previous direction
 	multi method move() {
+		say self.timer.promise.status;
+		say "move move";
 
 		# Insert a segment in the front
 		unless !self!insert-front() {
@@ -175,13 +178,19 @@ class Snake {
 
 			return;
 		}
+		say self.timer.promise.status;
+		say "move move moved";
 
 		# If the motion was unsuccessfull, this snake is DEAD!
 		$GAME-OVER = True;
+		say self.timer.promise.status;
+		say "move failure";
 	}
 
 	# Move in a specific direction
 	multi method move( Direction $dir ) {
+		say self.timer.promise.status;
+		say "move dir";
 
 		# Direction Control: the snake can only turn 90 degrees
 		if !self!check-turn($dir) {
@@ -360,8 +369,12 @@ class Settings {
 # Make the Snake(s) move
 sub init-timers {
 	for @PLAYERS -> $player {
-		$player.timer
+		$player.start-timer
 	}
+
+	@WINDOWS[2].mvprintw(0, 10, "hsodfdslfhskdjhfksdjhfksjhfkjsdhfkjshdkjshdksjdhksjdh********************************************");
+	@WINDOWS[2].refresh;
+	nc_refresh;
 }
 
 # Function that checks how many fields of the game board are filled with Snake segments
@@ -405,6 +418,7 @@ sub max-score {
 sub render {
 	unless $GAME-OVER {
 		snake-ui::render-game(@WINDOWS, @PLAYERS, @FOODS);
+		say @PLAYERS[0].timer.promise.status;
 	}
 
 	# Note: the $GAME-OVER check here is necessary, cause the check
@@ -436,6 +450,7 @@ sub game {
 
 	# Start the motions!
 	init-timers;
+	say @PLAYERS[0].timer.promise.status;
 
 	# While the Game's running
 	while !$GAME-OVER {
@@ -448,13 +463,15 @@ sub game {
 			when 104 | KEY_LEFT {	@PLAYERS[0].move(Left); render }
 
 			# 106 = j, 258 = down_arrow
-			when 106 | KEY_DOWN {	@PLAYERS[0].move(Down); render }
+			when 106 | KEY_DOWN {	@PLAYERS[0].move(Down); sleep 2;render }
 
 			# 107 = k, 259 = up_arrow
 			when 107 | KEY_UP {	@PLAYERS[0].move(Up); render }
 
 			# 108 = l, 261 = right_arrow
 			when 108 | KEY_RIGHT {	@PLAYERS[0].move(Right); render }
+
+			when 115 { game-over }
 
 			default { say $input }
 		}
@@ -466,6 +483,10 @@ sub game {
 
 # Emtpy the game state global vars
 sub purge {
+
+	$GAME-OVER = True;
+	say @PLAYERS[0].timer.promise.status;
+
 	until @PLAYERS.elems == 0 {
 		@PLAYERS.pop;
 	}
@@ -473,6 +494,9 @@ sub purge {
 	until @FOODS.elems == 0 {
 		@FOODS.pop;
 	}
+
+	say @PLAYERS[0];
+	sleep 5;
 }
 
 # On Game Over

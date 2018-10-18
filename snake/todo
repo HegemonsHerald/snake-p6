@@ -7,7 +7,7 @@ NEXT UP:
 	- fix game-over to power down ncurses
 		✓ impl a purge game state function, that takes FOOD and PLAYERS and empties them by calling pop until their elems returns 0
 		- there still is an unidentified problem with the init-timers and timer functions
-		- welcome-screen's getch doesn't seem to react to l and h...
+			- I think it's to do with the way GAME-OVER is reset... it seems the var is reset with the incorrect scopeing (somehow), so that the timer promise created on the next game run immediately says fuck it!
 
 	- add game-over screen
 
