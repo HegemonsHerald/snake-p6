@@ -417,7 +417,7 @@ sub render {
 }
 
 # Start the Game
-sub game-start is export {
+sub game-start {
 
 	# Render the initial screen
 	welcome-screen(@WINDOWS, $SETTINGS.high-score);
@@ -425,8 +425,9 @@ sub game-start is export {
 }
 
 # Run the Game
-sub game is export {
+sub game {
 
+	# Make absolutely sure, that the game can begin!
 	our $GAME-OVER = False;
 
 	# Setup Game Logic things...
@@ -434,7 +435,7 @@ sub game is export {
 	our @FOODS.push: Food.new();
 
 	# Start the motions!
-	#init-timers;
+	init-timers;
 
 	# While the Game's running
 	while !$GAME-OVER {
@@ -459,10 +460,25 @@ sub game is export {
 		}
 
 	}
+
+	game-over;
+}
+
+# Emtpy the game state global vars
+sub purge {
+	until @PLAYERS.elems == 0 {
+		@PLAYERS.pop;
+	}
+
+	until @FOODS.elems == 0 {
+		@FOODS.pop;
+	}
 }
 
 # On Game Over
-sub game-over is export {
+sub game-over {
+
+	purge;
 
 	# Render the game over screen
 	say "oi, game over...";
@@ -534,7 +550,6 @@ sub start-up ($height, $width, $speed, $interval, $length, $worth, $growth, $sta
 
 
 	# run the game!
-	game-start;
+	game-start;		# note: game-start is a one-time function that wraps the render welcome screen call
 	game;
-	game-over;
 }

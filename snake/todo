@@ -5,8 +5,9 @@
 NEXT UP:
 
 	- fix game-over to power down ncurses
-	   - something with the restarting is going wrong now, and I don't know what
-	   - possible solution: move game logic into its own scope, so the global vars are deallocated on game over (a real proper reset), except for the SETTINGS var and the SIZE vars and shit...
+		✓ impl a purge game state function, that takes FOOD and PLAYERS and empties them by calling pop until their elems returns 0
+		- there still is an unidentified problem with the init-timers and timer functions
+		- welcome-screen's getch doesn't seem to react to l and h...
 
 	- add game-over screen
 
