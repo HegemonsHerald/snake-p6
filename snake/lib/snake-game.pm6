@@ -468,7 +468,8 @@ sub game {
 			# 108 = l, 261 = right_arrow
 			when 108 | KEY_RIGHT {	@PLAYERS[0].move(Right); render }
 
-			when 115 { game-over }
+			# 115 = s
+			# when 115 { game-over }
 
 			default { say $input }
 		}
@@ -480,10 +481,8 @@ sub game {
 
 # Emtpy the game state global vars
 sub purge {
-
 	$GAME-OVER = True;
 
-	say @PLAYERS.elems;
 	until @PLAYERS.elems == 0 {
 		@PLAYERS.pop;
 	}
@@ -491,8 +490,6 @@ sub purge {
 	until @FOODS.elems == 0 {
 		@FOODS.pop;
 	}
-
-	say @PLAYERS[0];
 }
 
 # On Game Over
@@ -504,17 +501,26 @@ sub game-over {
 	# Render the game over screen
 	game-over-screen(@WINDOWS, $SETTINGS.high-score);
 
+	# Decide, whether to restart or not...
+	my $restart = False;
+
 	# Wait for user interaction
-	my $input = getch;
-	given $input {
-		# 114 = r
-		when 114 { game }
+	while 1 {
+		my $input = getch;
+		given $input {
+			# 114 = r
+			when 114 { $restart = True; last }
 
-		# 113 = q
-		when 113 { endwin }
+			# 113 = q
+			when 113 { last }
 
-		default {}
+			# If anything else, loop
+			default { next }
+		}
 	}
+
+	# Either restart or power down NCurses and quit
+	if $restart { game } else { endwin; exit }
 }
 
 # Kickoff!
@@ -576,6 +582,7 @@ sub start-up ($height, $width, $speed, $interval, $length, $worth, $growth, $sta
 	game;
 }
 
+# On leave, restore regular terminal behaviour
 LEAVE {
 	endwin
 }
