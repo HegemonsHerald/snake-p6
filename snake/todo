@@ -9,8 +9,6 @@ NEXT UP:
 
 	- bug: snake just randomly quit, claiming a segment doesn't have a y-field...? one time error?
 
-	- add game-over screen
-
 	- make methods, that can be private, private
 
 	- add retry-code: update High-Score and render High-Score
