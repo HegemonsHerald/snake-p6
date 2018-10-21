@@ -498,20 +498,23 @@ sub purge {
 # On Game Over
 sub game-over {
 
+	# Reset the game state
 	purge;
 
 	# Render the game over screen
-	say "oi, game over...";
-	say "oi, press R to restart...";
+	game-over-screen(@WINDOWS, $SETTINGS.high-score);
+
+	# Wait for user interaction
 	my $input = getch;
 	given $input {
+		# 114 = r
 		when 114 { game }
-		when 113 { endwin }
-	}
-	#game-over-screen(@WINDOWS, $HEIGHT, $WIDTH, $SETTINGS.high-score);
 
-	# If the game isn't restarted
-	#endwin
+		# 113 = q
+		when 113 { endwin }
+
+		default {}
+	}
 }
 
 # Kickoff!

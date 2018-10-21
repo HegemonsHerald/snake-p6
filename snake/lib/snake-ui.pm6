@@ -4,8 +4,9 @@ use NativeCall;
 
 unit module snake-ui;
 
-# Welcome and Game Over Screen messages
+# Welcome, Pause and Game Over Screen messages
 
+# WELCOME SCREEN
 # Small-ish
 our $WELCOME-SCREEN-PROMPT_1 = 'Please press';
 our $WELCOME-SCREEN-PROMPT_2 = '  Any Key';
@@ -20,30 +21,30 @@ $WELCOME-SCREEN-PROMPT_4,
 ];
 
 # Not small but not too big
-our $WELCOME-SCREEN-PROMPT-L_1 = '       Please press Any Key';
-our $WELCOME-SCREEN-PROMPT-L_2 = '     to start the game SNAKE!';
+our $WELCOME-SCREEN-PROMPT-L_1 =  '       Please press Any Key';
+our $WELCOME-SCREEN-PROMPT-L_2 =  '     to start the game SNAKE!';
 our @WELCOME-SCREEN-MESSAGE-L = [ ' ____  _   _    _    _  _______ _ ',
-'/ ___|| \ | |  / \  | |/ / ____| |',
-'\___ \|  \| | / _ \ | \' /|  _| | |',
-' ___) | |\  |/ ___ \| . \| |___|_|',
-'|____/|_| \_/_/   \_\_|\_\_____(_)',
-'',
-"$WELCOME-SCREEN-PROMPT-L_1",
-"$WELCOME-SCREEN-PROMPT-L_2", ];
+				  '/ ___|| \ | |  / \  | |/ / ____| |',
+				  '\___ \|  \| | / _ \ | \' /|  _| | |',
+				  ' ___) | |\  |/ ___ \| . \| |___|_|',
+				  '|____/|_| \_/_/   \_\_|\_\_____(_)',
+				  '',
+				  "$WELCOME-SCREEN-PROMPT-L_1",
+				  "$WELCOME-SCREEN-PROMPT-L_2", ];
 
 # Friggin humongous
-our $WELCOME-SCREEN-PROMPT-XL = "           Please press Any Key to start the game SNAKE!";
+our $WELCOME-SCREEN-PROMPT-XL =    "           Please press Any Key to start the game SNAKE!";
 our @WELCOME-SCREEN-MESSAGE-XL = [ ' ╔═════╗   ╔══╗  ╔══╗        ╔══╗        ╔══╗ ╔══╗  ╔════════╗  ╔══╗',
-'╔╝█████╚╗  ║██╚╗ ║██║       ╔╝██╚╗       ║██║╔╝██║  ║████████║  ║██║',
-'║██╔═╗██║  ║███╚╗║██║      ╔╝████╚╗      ║██╠╝██╔╝  ║██╔═════╝  ║██║',
-'║██║ ╚══╝  ║████╚╣██║     ╔╝██╔╗██╚╗     ║██║██╔╝   ║██║        ║██║',
-'║██╚════╗  ║██║██║██║    ╔╝██═╩╩═██╚╗    ║█████║    ║██╚═════╗  ║██║',
-'╚╗██████║  ║██╠╗████║   ╔╝██████████╚╗   ║██║██╚╗   ║████████║  ╚══╝',
-'╔╩════██║  ║██║╚╗███║  ╔╝██╔══════╗██╚╗  ║██╠╗██╚╗  ║██══════╣  ╔══╗',
-'║██████╔╝  ║██║ ╚╗██║  ║██╔╝      ╚╗██║  ║██║╚╗██║  ║████████║  ║██║',
-'╚══════╝   ╚══╝  ╚══╝  ╚══╝        ╚══╝  ╚══╝ ╚══╝  ╚════════╝  ╚══╝',
-'',
-"$WELCOME-SCREEN-PROMPT-XL" ];
+				   '╔╝█████╚╗  ║██╚╗ ║██║       ╔╝██╚╗       ║██║╔╝██║  ║████████║  ║██║',
+				   '║██╔═╗██║  ║███╚╗║██║      ╔╝████╚╗      ║██╠╝██╔╝  ║██╔═════╝  ║██║',
+				   '║██║ ╚══╝  ║████╚╣██║     ╔╝██╔╗██╚╗     ║██║██╔╝   ║██║        ║██║',
+				   '║██╚════╗  ║██║██║██║    ╔╝██═╩╩═██╚╗    ║█████║    ║██╚═════╗  ║██║',
+				   '╚╗██████║  ║██╠╗████║   ╔╝██████████╚╗   ║██║██╚╗   ║████████║  ╚══╝',
+				   '╔╩════██║  ║██║╚╗███║  ╔╝██╔══════╗██╚╗  ║██╠╗██╚╗  ║██══════╣  ╔══╗',
+				   '║██████╔╝  ║██║ ╚╗██║  ║██╔╝      ╚╗██║  ║██║╚╗██║  ║████████║  ║██║',
+				   '╚══════╝   ╚══╝  ╚══╝  ╚══╝        ╚══╝  ╚══╝ ╚══╝  ╚════════╝  ╚══╝',
+				   '',
+				   "$WELCOME-SCREEN-PROMPT-XL" ];
 
 # Collection of possible messages
 our @WELCOME-SCREEN-MESSAGE-OPTIONS = [
@@ -53,6 +54,59 @@ our @WELCOME-SCREEN-MESSAGE-OPTIONS = [
 ];
 
 
+# GAME OVER
+# Small-ish
+our $GAME-OVER-SCREEN-PROMPT_1 = ' Press R';
+our $GAME-OVER-SCREEN-PROMPT_2 = 'to restart';
+our $GAME-OVER-SCREEN-PROMPT_3 = 'the Game!';
+our @GAME-OVER-SCREEN-MESSAGE = ['GAME OVER!',
+'',
+$GAME-OVER-SCREEN-PROMPT_1,
+$GAME-OVER-SCREEN-PROMPT_2,
+$GAME-OVER-SCREEN-PROMPT_3,
+];
+
+# Not small but not too big
+our $GAME-OVER-SCREEN-PROMPT-L_1 =  '                     Please press R',
+our $GAME-OVER-SCREEN-PROMPT-L_2 =  '               to restart the game SNAKE!',
+our @GAME-OVER-SCREEN-MESSAGE-L = [ '  ____    _    __  __ _____    _____     _______ ____  _ ',
+				    ' / ___|  / \  |  \/  | ____|  / _ \ \   / / ____|  _ \| |',
+				    '| |  _  / _ \ | |\/| |  _|   | | | \ \ / /|  _| | |_) | |',
+				    '| |_| |/ ___ \| |  | | |___  | |_| |\ V / | |___|  _ <|_|',
+				    ' \____/_/   \_\_|  |_|_____|  \___/  \_/  |_____|_| \_(_)',
+				    '',
+				    "$GAME-OVER-SCREEN-PROMPT-L_1",
+				    "$GAME-OVER-SCREEN-PROMPT-L_2", ];
+
+# Friggin humongous
+our $GAME-OVER-SCREEN-PROMPT-XL =    "           Please press R to restart the game SNAKE!";
+our @GAME-OVER-SCREEN-MESSAGE-XL = [ '    ╔═══════╗          ╔══╗        ╔══╗     ╔══╗  ╔════════╗',
+				     '   ╔╝███████╚╗        ╔╝██╚╗       ║██╚╗   ╔╝██║  ║████████║',
+				     '  ╔╝██╔═══╗██║       ╔╝████╚╗      ║███╚╗ ╔╝███║  ║██╔═════╝',
+				     '  ║██╔╝   ╚══╝      ╔╝██╔╗██╚╗     ║████╚═╝████║  ║██║      ',
+				     '  ║██║╔═══════╗    ╔╝██═╩╩═██╚╗    ║██║██ ██║██║  ║██╚═════╗',
+				     '  ║██╚╣███████║   ╔╝██████████╚╗   ║██╠╗███╔╣██║  ║████████║',
+				     '  ╚╗██╚═══╝██╔╝  ╔╝██╔══════╗██╚╗  ║██║╚═══╝║██║  ║██══════╣',
+				     '   ╚╗███████╔╝   ║██╔╝      ╚╗██║  ║██║     ║██║  ║████████║',
+				     '    ╚═══════╝    ╚══╝        ╚══╝  ╚══╝     ╚══╝  ╚════════╝',
+				     '  ╔═══════╗    ╔══╗         ╔══╗  ╔════════╗  ╔════════╗    ╔══╗',
+				     ' ╔╝███████╚╗   ║██╚╗       ╔╝██║  ║████████║  ║████████╚╗   ║██║',
+				     '╔╝██╔═══╗██╚╗  ╚╗██╚╗     ╔╝██╔╝  ║██╔═════╝  ║██╔═══╗██║   ║██║',
+				     '║██╔╝   ╚╗██║   ╚╗██╚╗   ╔╝██╔╝   ║██║        ║██║   ║██║   ║██║',
+				     '║██║     ║██║    ╚╗██╚╗ ╔╝██╔╝    ║██╚═════╗  ║██╚═══╝██║   ║██║',
+				     '║██╚╗   ╔╝██║     ╚╗██╚═╝██╔╝     ║████████║  ║████████╔╝   ╚══╝',
+				     '╚╗██╚═══╝██╔╝      ╚╗██ ██╔╝      ║██══════╣  ║██╔═══╗██╚╗  ╔══╗',
+				     ' ╚╗███████╔╝        ╚╗███╔╝       ║████████║  ║██║   ╚╗██║  ║██║',
+				     '  ╚═══════╝          ╚═══╝        ╚════════╝  ╚══╝    ╚══╝  ╚══╝',
+				     '',
+				     "$GAME-OVER-SCREEN-PROMPT-XL" ];
+
+# Collection of possible messages
+our @GAME-OVER-SCREEN-MESSAGE-OPTIONS = [
+	@GAME-OVER-SCREEN-MESSAGE-XL,
+	@GAME-OVER-SCREEN-MESSAGE-L,
+	@GAME-OVER-SCREEN-MESSAGE,
+];
 
 
 # setlocale from libc, sets the locale for the native Strings, that are passed to NCurses and makes NCurses use wide/unicode chars
@@ -262,27 +316,39 @@ class Top is Window is export {
 
 # Middle Window
 class Middle is Window is export {
-	method print-welcome-message {
-		my @welcome-screen-message;
 
-		# Figure out, which size message to print
-		for @WELCOME-SCREEN-MESSAGE-OPTIONS -> @message {
-			unless @message[0].chars >= $.width || @message.elems >= $.height {
-				@welcome-screen-message = @message;
+	# Method, that prints the largest fitting message from the @options
+	# Take a look at the hard-coded messages at the beginning of this file, for an example...
+	method !print-message(@options) {
+		my @message;
+
+		# Choose the right size message from the options
+		for @options -> @m {
+			unless @m[0].chars >= $.width || @m.elems >= $.height {
+				@message = @m;
 				last;
 			}
 
-			@welcome-screen-message = [ "" ]
+			# If none of the message options works, use empty
+			@message = [ "" ]
 		}
 
 		# Find the starting position for drawing the message's parts
-		my $message-start-y = $.height div 2 - @welcome-screen-message.elems div 2;
-		my $message-start-x = $.width div 2 - @welcome-screen-message[0].chars div 2;
+		my $message-start-y = $.height div 2 - @message.elems div 2;
+		my $message-start-x = $.width div 2 - @message[0].chars div 2;
 
 		# Print the message
-		for @welcome-screen-message.kv -> $ind, $line {
+		for @message.kv -> $ind, $line {
 			self.mvprintw($message-start-y + $ind, $message-start-x, $line);
 		}
+	}
+
+	method print-welcome-message {
+		self!print-message: @WELCOME-SCREEN-MESSAGE-OPTIONS
+	}
+
+	method print-game-over-message {
+		self!print-message: @GAME-OVER-SCREEN-MESSAGE-OPTIONS
 	}
 }
 
@@ -322,6 +388,9 @@ sub welcome-screen (@windows, $high-score) is export {
 
 	# Shortcuts
 	my ($top, $mid, $bot) = @windows[1..3];
+	
+
+	# GENERAL SETUP
 
 	# Set the color palette...
 	$top.color(COLOR_PAIR_1);
@@ -334,6 +403,9 @@ sub welcome-screen (@windows, $high-score) is export {
 
 	# Make the windows visible
 	@windows all "bkgd";
+
+
+	# RENDER WELCOME SCREEN
 
 	# Print the Top Bar
 	$top.print-snake-field;
@@ -397,12 +469,16 @@ sub game-over-screen (@windows, $high-score) is export {
 	# Shortcuts
 	my ($top, $mid, $bot) = @windows[1..3];
 
-	# Render Game Over Screen
-	# ...
+	# RENDER GAME OVER SCREEN
 
+	# Update the Top Bar
 	$top.print-high-score-field($high-score);
 
+	# Print the Game Over Message
+	$mid.print-game-over-message;
 
-	# Wait for input
+	# Refresh
+	@windows all "refresh";
 
-	}
+	move(0,0);
+}

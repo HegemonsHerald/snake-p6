@@ -9,8 +9,6 @@ NEXT UP:
 
 	- bug: snake just randomly quit, claiming a segment doesn't have a y-field...? one time error?
 
-	- make a max-speed increase, cause the intervals will screw you otherwise!
-
 	- add game-over screen
 
 	- make methods, that can be private, private
