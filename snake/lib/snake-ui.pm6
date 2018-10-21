@@ -405,4 +405,4 @@ sub game-over-screen (@windows, $high-score) is export {
 
 	# Wait for input
 
-}
+	}

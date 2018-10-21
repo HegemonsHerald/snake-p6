@@ -85,8 +85,18 @@ class Timer {
 
 			}
 
+			# If game over, make the interval stop!
+			self.clear-interval;
+
+			# Close the Supply
 			$.meta-supplier.done;
+			return
 		});
+	}
+
+	# A function to set the interval Supply to not be an interval Supply
+	method clear-interval {
+		$.meta-supplier.emit: supply { }
 	}
 
 	# A function to change the speed of the movement interval
@@ -149,7 +159,7 @@ class Snake {
 
 	method start-timer {
 		$.timer = Timer.new(self);
-		$.timer.start
+		$.timer.start;
 	}
 
 	method kill-timer {
@@ -159,8 +169,11 @@ class Snake {
 
 	# Move in previous direction
 	multi method move() {
-		say self.timer.promise.status;
-		say "move move";
+		printf "move move: ";
+		unless self.timer ~~ Int {
+			printf self.timer.promise.status;
+		}
+		printf "\n";
 
 		# Insert a segment in the front
 		unless !self!insert-front() {
@@ -178,19 +191,22 @@ class Snake {
 
 			return;
 		}
-		say self.timer.promise.status;
-		say "move move moved";
+		printf "move move moved: ";
+		printf self.timer.promise.status;
+		printf "\n";
 
 		# If the motion was unsuccessfull, this snake is DEAD!
 		$GAME-OVER = True;
-		say self.timer.promise.status;
-		say "move failure";
+		printf "move failure: ";
+		printf self.timer.promise.status;
+		printf "\n";
 	}
 
 	# Move in a specific direction
 	multi method move( Direction $dir ) {
-		say self.timer.promise.status;
-		say "move dir";
+		printf "move dir: ";
+		printf self.timer.promise.status;
+		printf "\n";
 
 		# Direction Control: the snake can only turn 90 degrees
 		if !self!check-turn($dir) {
@@ -369,6 +385,7 @@ class Settings {
 # Make the Snake(s) move
 sub init-timers {
 	for @PLAYERS -> $player {
+		$player.move;
 		$player.start-timer
 	}
 
@@ -418,7 +435,9 @@ sub max-score {
 sub render {
 	unless $GAME-OVER {
 		snake-ui::render-game(@WINDOWS, @PLAYERS, @FOODS);
-		say @PLAYERS[0].timer.promise.status;
+		printf "render: ";
+		printf @PLAYERS[0].timer.promise.status;
+		printf "\n";
 	}
 
 	# Note: the $GAME-OVER check here is necessary, cause the check
@@ -450,7 +469,9 @@ sub game {
 
 	# Start the motions!
 	init-timers;
-	say @PLAYERS[0].timer.promise.status;
+	printf "game: ";
+	printf @PLAYERS[0].timer.promise.status;
+	printf "\n";
 
 	# While the Game's running
 	while !$GAME-OVER {
@@ -463,7 +484,7 @@ sub game {
 			when 104 | KEY_LEFT {	@PLAYERS[0].move(Left); render }
 
 			# 106 = j, 258 = down_arrow
-			when 106 | KEY_DOWN {	@PLAYERS[0].move(Down); sleep 2;render }
+			when 106 | KEY_DOWN {	@PLAYERS[0].move(Down); render }
 
 			# 107 = k, 259 = up_arrow
 			when 107 | KEY_UP {	@PLAYERS[0].move(Up); render }
@@ -485,8 +506,8 @@ sub game {
 sub purge {
 
 	$GAME-OVER = True;
-	say @PLAYERS[0].timer.promise.status;
 
+	say @PLAYERS.elems;
 	until @PLAYERS.elems == 0 {
 		@PLAYERS.pop;
 	}
@@ -496,7 +517,6 @@ sub purge {
 	}
 
 	say @PLAYERS[0];
-	sleep 5;
 }
 
 # On Game Over
@@ -560,7 +580,6 @@ sub start-up ($height, $width, $speed, $interval, $length, $worth, $growth, $sta
 	our $W-OFFSET	= 0;				# offset for the renderer: add this to all game element's X-position-values to offset against the borders...
 	our @PLAYERS	= [];
 	our @FOODS	= [];
-	our $GAME-OVER  = False;
 
 	our $SETTINGS	= Settings.create($speed, $interval, $length, $worth, $growth, $start-direction);
 
@@ -576,4 +595,8 @@ sub start-up ($height, $width, $speed, $interval, $length, $worth, $growth, $sta
 	# run the game!
 	game-start;		# note: game-start is a one-time function that wraps the render welcome screen call
 	game;
+}
+
+LEAVE {
+	endwin
 }
