@@ -1,19 +1,11 @@
 
 
+NOTE: I've disabled the autocmd that changes the vim guicursor to a pipe-line. That was the cause of 'q's showing up in tmux....
 
 
 NEXT UP:
 
-	- fix game-over to power down ncurses
-		✓ impl a purge game state function, that takes FOOD and PLAYERS and empties them by calling pop until their elems returns 0
-		- there still is an unidentified problem with the init-timers and timer functions
-			- I think it's to do with the way GAME-OVER is reset... it seems the var is reset with the incorrect scopeing (somehow), so that the timer promise created on the next game run immediately says fuck it!
-			- Alright, observation: the new instance of snake believes, it's going to hit something immediately (the collision checker calls for the game over!)... maybe it's hitting itself? maybe the previous snake? IDK
-
-			- observation: the promise is broken even before the init-timers function gets called... does that mean sth async is responsible here?
-			- observation: the speed increase is broken (indicative of the intervals being broken?)
-
-NOTE: I've disabled the autocmd that changes the vim guicursor to a pipe-line. That was the cause of 'q's showing up in tmux....
+	- bug: if the snake collides with its tail end, it collides with a segment, that'll be moved away. The game-over doesn't work there
 
 	- make a max-speed increase, cause the intervals will screw you otherwise!
 

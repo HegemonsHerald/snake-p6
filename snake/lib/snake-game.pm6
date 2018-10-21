@@ -374,10 +374,6 @@ sub init-timers {
 		$player.move;
 		$player.start-timer
 	}
-
-	@WINDOWS[2].mvprintw(0, 10, "hsodfdslfhskdjhfksdjhfksjhfkjsdhfkjshdkjshdksjdhksjdh********************************************");
-	@WINDOWS[2].refresh;
-	nc_refresh;
 }
 
 # Function that checks how many fields of the game board are filled with Snake segments
