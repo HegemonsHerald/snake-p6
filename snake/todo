@@ -7,6 +7,8 @@ NEXT UP:
 
 	- bug: if the snake collides with its tail end, it collides with a segment, that'll be moved away. The game-over doesn't work there
 
+	- bug: snake just randomly quit, claiming a segment doesn't have a y-field...? one time error?
+
 	- make a max-speed increase, cause the intervals will screw you otherwise!
 
 	- add game-over screen

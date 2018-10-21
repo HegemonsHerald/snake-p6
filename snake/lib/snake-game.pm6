@@ -70,8 +70,8 @@ class Timer {
 					self.change-interval;
 					$.speed-counter = 0;
 
-				# If the score has increased by 5
-				} elsif $.speed-counter == ( $.parent-player.score - $SETTINGS.speed-change-interval ) {
+				# If the score has increased by 5 && this is at max the fourth speed increase (Supply.interval only goes down to 0.1, we start at 0.5 with .1 speed increases...)
+				} elsif $.speed-counter == ( $.parent-player.score - $SETTINGS.speed-change-interval ) && $.parent-player.score <= $SETTINGS.speed-change-interval * 4 {
 
 					# Set a new interval speed
 					$.current-speed = self.new-speed;
