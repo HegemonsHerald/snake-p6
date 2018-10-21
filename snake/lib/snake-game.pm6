@@ -169,11 +169,6 @@ class Snake {
 
 	# Move in previous direction
 	multi method move() {
-		printf "move move: ";
-		unless self.timer ~~ Int {
-			printf self.timer.promise.status;
-		}
-		printf "\n";
 
 		# Insert a segment in the front
 		unless !self!insert-front() {
@@ -191,22 +186,13 @@ class Snake {
 
 			return;
 		}
-		printf "move move moved: ";
-		printf self.timer.promise.status;
-		printf "\n";
 
 		# If the motion was unsuccessfull, this snake is DEAD!
 		$GAME-OVER = True;
-		printf "move failure: ";
-		printf self.timer.promise.status;
-		printf "\n";
 	}
 
 	# Move in a specific direction
 	multi method move( Direction $dir ) {
-		printf "move dir: ";
-		printf self.timer.promise.status;
-		printf "\n";
 
 		# Direction Control: the snake can only turn 90 degrees
 		if !self!check-turn($dir) {
@@ -435,9 +421,6 @@ sub max-score {
 sub render {
 	unless $GAME-OVER {
 		snake-ui::render-game(@WINDOWS, @PLAYERS, @FOODS);
-		printf "render: ";
-		printf @PLAYERS[0].timer.promise.status;
-		printf "\n";
 	}
 
 	# Note: the $GAME-OVER check here is necessary, cause the check
@@ -469,9 +452,6 @@ sub game {
 
 	# Start the motions!
 	init-timers;
-	printf "game: ";
-	printf @PLAYERS[0].timer.promise.status;
-	printf "\n";
 
 	# While the Game's running
 	while !$GAME-OVER {
