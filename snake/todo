@@ -11,8 +11,6 @@ NEXT UP:
 
 	- make methods, that can be private, private
 
-	- add retry-code: update High-Score and render High-Score
-
 	- add pause screen
 		- requires the motion intervals to be stopped
 			→ they have a current speed, eh? rename init-timers to start-timers

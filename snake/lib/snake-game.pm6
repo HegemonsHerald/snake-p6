@@ -350,7 +350,7 @@ class Food {
 
 # Settings object
 class Settings {
-	has $.high-score;
+	has $.high-score is rw;
 	has $.start-speed;		# How fast a snake is at the start, in delta seconds between ticks
 	has $.speed-change-interval;	# How many points a player has to make, til he gets a speed increase
 	has $.start-score;		# How many points a snake has at the start
@@ -407,6 +407,28 @@ sub say-snake {
 # Function to calculate the maximally possible score
 sub max-score {
 	return ( $HEIGHT * $WIDTH - $SETTINGS.start-length ) * $SETTINGS.points-worth
+}
+
+# Function to update the high-score
+sub set-high-score {
+	for @PLAYERS -> $player {
+		if $player.score > $SETTINGS.high-score {
+			$SETTINGS.high-score = $player.score
+		}
+	}
+}
+
+# Emtpy the game state global vars
+sub purge {
+	$GAME-OVER = True;
+
+	until @PLAYERS.elems == 0 {
+		@PLAYERS.pop;
+	}
+
+	until @FOODS.elems == 0 {
+		@FOODS.pop;
+	}
 }
 
 # *****************************************************************************
@@ -479,21 +501,12 @@ sub game {
 	game-over;
 }
 
-# Emtpy the game state global vars
-sub purge {
-	$GAME-OVER = True;
-
-	until @PLAYERS.elems == 0 {
-		@PLAYERS.pop;
-	}
-
-	until @FOODS.elems == 0 {
-		@FOODS.pop;
-	}
-}
 
 # On Game Over
 sub game-over {
+
+	# Update High-Score
+	set-high-score;
 
 	# Reset the game state
 	purge;
