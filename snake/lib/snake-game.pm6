@@ -67,17 +67,17 @@ class Timer {
 
 				# If speed-counter is in initial state, kick off the intervall
 				if $.speed-counter == -1 {
-					self.change-interval;
+					self!change-interval;
 					$.speed-counter = 0;
 
 				# If the score has increased by 5 && this is at max the fourth speed increase (Supply.interval only goes down to 0.1, we start at 0.5 with .1 speed increases...)
 				} elsif $.speed-counter == ( $.parent-player.score - $SETTINGS.speed-change-interval ) && $.parent-player.score <= $SETTINGS.speed-change-interval * 4 {
 
 					# Set a new interval speed
-					$.current-speed = self.new-speed;
+					$.current-speed = self!new-speed;
 
 					# Update the interval
-					self.change-interval;
+					self!change-interval;
 
 					# And update the counter
 					$.speed-counter = $.parent-player.score
@@ -86,7 +86,7 @@ class Timer {
 			}
 
 			# If game over, make the interval stop!
-			self.clear-interval;
+			self!clear-interval;
 
 			# Close the Supply
 			$.meta-supplier.done;
@@ -95,12 +95,12 @@ class Timer {
 	}
 
 	# A function to set the interval Supply to not be an interval Supply
-	method clear-interval {
+	method !clear-interval {
 		$.meta-supplier.emit: supply { }
 	}
 
 	# A function to change the speed of the movement interval
-	method change-interval {
+	method !change-interval {
 
 		# Emit a new interval supply
 		$.meta-supplier.emit( supply {
@@ -122,7 +122,7 @@ class Timer {
 	}
 
 	# Calculate speed in seconds
-	method new-speed {
+	method !new-speed {
 		return ( $.current-speed - 0.1 )
 	}
 

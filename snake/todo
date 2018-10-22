@@ -9,8 +9,6 @@ NEXT UP:
 
 	- bug: snake just randomly quit, claiming a segment doesn't have a y-field...? one time error?
 
-	- make methods, that can be private, private
-
 	- add pause screen
 		- requires the motion intervals to be stopped
 			→ they have a current speed, eh? rename init-timers to start-timers
@@ -22,3 +20,5 @@ NEXT UP:
 	- snake head with ▲ ▶ ▼ ◀
 
 	- make snake start-direction variable (requires code to create snake in right direction)
+
+	- make methods, that can be private, private
