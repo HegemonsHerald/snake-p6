@@ -80,24 +80,24 @@ our @GAME-OVER-SCREEN-MESSAGE-L = [ '  ____    _    __  __ _____    _____     __
 
 # Friggin humongous
 our $GAME-OVER-SCREEN-PROMPT-XL =    "           Please press R to restart the game SNAKE!";
-our @GAME-OVER-SCREEN-MESSAGE-XL = [ '    ╔═══════╗          ╔══╗        ╔══╗     ╔══╗  ╔════════╗',
-				     '   ╔╝███████╚╗        ╔╝██╚╗       ║██╚╗   ╔╝██║  ║████████║',
-				     '  ╔╝██╔═══╗██║       ╔╝████╚╗      ║███╚╗ ╔╝███║  ║██╔═════╝',
-				     '  ║██╔╝   ╚══╝      ╔╝██╔╗██╚╗     ║████╚═╝████║  ║██║      ',
-				     '  ║██║╔═══════╗    ╔╝██═╩╩═██╚╗    ║██║██ ██║██║  ║██╚═════╗',
-				     '  ║██╚╣███████║   ╔╝██████████╚╗   ║██╠╗███╔╣██║  ║████████║',
-				     '  ╚╗██╚═══╝██╔╝  ╔╝██╔══════╗██╚╗  ║██║╚═══╝║██║  ║██══════╣',
-				     '   ╚╗███████╔╝   ║██╔╝      ╚╗██║  ║██║     ║██║  ║████████║',
-				     '    ╚═══════╝    ╚══╝        ╚══╝  ╚══╝     ╚══╝  ╚════════╝',
-				     '  ╔═══════╗    ╔══╗         ╔══╗  ╔════════╗  ╔════════╗    ╔══╗',
-				     ' ╔╝███████╚╗   ║██╚╗       ╔╝██║  ║████████║  ║████████╚╗   ║██║',
-				     '╔╝██╔═══╗██╚╗  ╚╗██╚╗     ╔╝██╔╝  ║██╔═════╝  ║██╔═══╗██║   ║██║',
-				     '║██╔╝   ╚╗██║   ╚╗██╚╗   ╔╝██╔╝   ║██║        ║██║   ║██║   ║██║',
-				     '║██║     ║██║    ╚╗██╚╗ ╔╝██╔╝    ║██╚═════╗  ║██╚═══╝██║   ║██║',
-				     '║██╚╗   ╔╝██║     ╚╗██╚═╝██╔╝     ║████████║  ║████████╔╝   ╚══╝',
-				     '╚╗██╚═══╝██╔╝      ╚╗██ ██╔╝      ║██══════╣  ║██╔═══╗██╚╗  ╔══╗',
-				     ' ╚╗███████╔╝        ╚╗███╔╝       ║████████║  ║██║   ╚╗██║  ║██║',
-				     '  ╚═══════╝          ╚═══╝        ╚════════╝  ╚══╝    ╚══╝  ╚══╝',
+our @GAME-OVER-SCREEN-MESSAGE-XL = [ '     ╔═══════╗          ╔══╗        ╔══╗     ╔══╗  ╔════════╗',
+				     '    ╔╝███████╚╗        ╔╝██╚╗       ║██╚╗   ╔╝██║  ║████████║',
+				     '   ╔╝██╔═══╗██║       ╔╝████╚╗      ║███╚╗ ╔╝███║  ║██╔═════╝',
+				     '   ║██╔╝   ╚══╝      ╔╝██╔╗██╚╗     ║████╚╦╝████║  ║██║      ',
+				     '   ║██║╔═══════╗    ╔╝██═╩╩═██╚╗    ║██║██║██║██║  ║██╚═════╗',
+				     '   ║██╚╣███████║   ╔╝██████████╚╗   ║██╠╗███╔╣██║  ║████████║',
+				     '   ╚╗██╚═══╝██╔╝  ╔╝██╔══════╗██╚╗  ║██║╚═══╝║██║  ║██══════╣',
+				     '    ╚╗███████╔╝   ║██╔╝      ╚╗██║  ║██║     ║██║  ║████████║',
+				     '     ╚═══════╝    ╚══╝        ╚══╝  ╚══╝     ╚══╝  ╚════════╝',
+				     '  ╔═══════╗    ╔══╗         ╔══╗  ╔════════╗  ╔════════╗    ╔══╗ ',
+				     ' ╔╝███████╚╗   ║██╚╗       ╔╝██║  ║████████║  ║████████╚╗   ║██║ ',
+				     '╔╝██╔═══╗██╚╗  ╚╗██╚╗     ╔╝██╔╝  ║██╔═════╝  ║██╔═══╗██║   ║██║ ',
+				     '║██╔╝   ╚╗██║   ╚╗██╚╗   ╔╝██╔╝   ║██║        ║██║   ║██║   ║██║ ',
+				     '║██║     ║██║    ╚╗██╚╗ ╔╝██╔╝    ║██╚═════╗  ║██╚═══╝██║   ║██║ ',
+				     '║██╚╗   ╔╝██║     ╚╗██╚╦╝██╔╝     ║████████║  ║████████═╣   ╚══╝ ',
+				     '╚╗██╚═══╝██╔╝      ╚╗██║██╔╝      ║██══════╣  ║██╔═══╗██╚╗  ╔══╗ ',
+				     ' ╚╗███████╔╝        ╚╗███╔╝       ║████████║  ║██║   ╚╗██║  ║██║ ',
+				     '  ╚═══════╝          ╚═══╝        ╚════════╝  ╚══╝    ╚══╝  ╚══╝ ',
 				     '',
 				     "$GAME-OVER-SCREEN-PROMPT-XL" ];
 
@@ -108,6 +108,51 @@ our @GAME-OVER-SCREEN-MESSAGE-OPTIONS = [
 	@GAME-OVER-SCREEN-MESSAGE,
 ];
 
+
+# PAUSE
+# Small-ish
+our $PAUSE-SCREEN-PROMPT_1 = 'Please press';
+our $PAUSE-SCREEN-PROMPT_2 = '  Any Key';
+our $PAUSE-SCREEN-PROMPT_3 = ' to resume';
+our $PAUSE-SCREEN-PROMPT_4 = '  the Game!';
+our @PAUSE-SCREEN-MESSAGE = ['   SNAKE!   ',
+'',
+$PAUSE-SCREEN-PROMPT_1,
+$PAUSE-SCREEN-PROMPT_2,
+$PAUSE-SCREEN-PROMPT_3,
+];
+
+# Not small but not too big
+our $PAUSE-SCREEN-PROMPT-L_1 =  '      Please press Any Key';
+our $PAUSE-SCREEN-PROMPT-L_2 =  '   to resume the game SNAKE!';
+our @PAUSE-SCREEN-MESSAGE-L = [ ' ____   _   _   _ ____  _____ _ ',
+				'|  _ \ / \ | | | / ___|| ____| |',
+				'| |_) / _ \| | | \___ \|  _| | |',
+				'|  __/ ___ \ |_| |___) | |___|_|',
+				'|_| /_/   \_\___/|____/|_____(_)',
+				"$PAUSE-SCREEN-PROMPT-L_1",
+				"$PAUSE-SCREEN-PROMPT-L_2", ];
+
+# Friggin humongous
+our $PAUSE-SCREEN-PROMPT-XL =    '             Please press Any Key to resume the game SNAKE!';
+our @PAUSE-SCREEN-MESSAGE-XL = [ '╔════════╗         ╔══╗        ╔══╗     ╔══╗   ╔═════╗   ╔════════╗  ╔══╗',
+				 '║████████╚╗       ╔╝██╚╗       ║██║     ║██║  ╔╝█████╚╗  ║████████║  ║██║',
+				 '║██╔═══╗██║      ╔╝████╚╗      ║██║     ║██║  ║██╔═╗██║  ║██╔═════╝  ║██║',
+				 '║██║   ║██║     ╔╝██╔╗██╚╗     ║██║     ║██║  ║██║ ╚══╝  ║██║        ║██║',
+				 '║██╚═══╝██║    ╔╝██═╩╩═██╚╗    ║██║     ║██║  ║██╚════╗  ║██╚═════╗  ║██║',
+				 '║████████╔╝   ╔╝██████████╚╗   ║██╚╗   ╔╝██║  ╚╗██████║  ║████████║  ╚══╝',
+				 '║██╔═════╝   ╔╝██╔══════╗██╚╗  ╚╗██╚═══╝██╔╝   ╠════██║  ║██══════╣  ╔══╗',
+				 '║██║         ║██╔╝      ╚╗██║   ╚╗███████╔╝    ║█████╔╝  ║████████║  ║██║',
+				 '╚══╝         ╚══╝        ╚══╝    ╚═══════╝     ╚═════╝   ╚════════╝  ╚══╝',
+				 '',
+				 "$PAUSE-SCREEN-PROMPT-XL" ];
+
+# Collection of possible messages
+our @PAUSE-SCREEN-MESSAGE-OPTIONS = [
+	@PAUSE-SCREEN-MESSAGE-XL,
+	@PAUSE-SCREEN-MESSAGE-L,
+	@PAUSE-SCREEN-MESSAGE,
+];
 
 # setlocale from libc, sets the locale for the native Strings, that are passed to NCurses and makes NCurses use wide/unicode chars
 sub setlocale(int32, Str) returns Str is native(Str) {*};
@@ -298,8 +343,13 @@ class Top is Window is export {
 
 	# Print the Message on the Left Side of the Top Window
 	method print-snake-field {
+
+		# Print the field
 		self.move($.snake-field.y-anchor, $.snake-field.x-anchor);
 		self.wprintw(self.snake-message);
+
+		# Refresh
+		self.refresh;
 	}
 
 	# Print the Message on the Right Side of the Top Window... that's the High Score
@@ -311,6 +361,9 @@ class Top is Window is export {
 		# Print the field
 		self.move($.high-score-field.y-anchor, $.high-score-field.x-anchor);
 		self.wprintw($string);
+
+		# Refresh
+		self.refresh;
 	}
 }
 
@@ -341,6 +394,9 @@ class Middle is Window is export {
 		for @message.kv -> $ind, $line {
 			self.mvprintw($message-start-y + $ind, $message-start-x, $line);
 		}
+
+		# Refresh
+		self.refresh;
 	}
 
 	method print-welcome-message {
@@ -349,6 +405,10 @@ class Middle is Window is export {
 
 	method print-game-over-message {
 		self!print-message: @GAME-OVER-SCREEN-MESSAGE-OPTIONS
+	}
+
+	method print-pause-screen-message {
+		self!print-message: @PAUSE-SCREEN-MESSAGE-OPTIONS
 	}
 }
 
@@ -379,6 +439,9 @@ class Bottom is Window is export {
 		# Print the field
 		self.move($.score-field.y-anchor, $.score-field.x-anchor);
 		self.wprintw($string);
+
+		# Refresh
+		self.refresh;
 	}
 }
 
@@ -419,6 +482,7 @@ sub welcome-screen (@windows, $high-score) is export {
 
 	# Refresh
 	@windows all "refresh";
+	nc_refresh;
 
 	move(0,0);
 
@@ -452,15 +516,31 @@ our sub render-game (@windows, @players, @foods) {
 		}
 	}
 
+	# ... I said render before, I lied.
+	$mid.refresh;
+
 	# Render Score Board (bottom bar)
 	$bot.print-score-field(@players[0].score);
 	# NOTE: this would have to be done differently for a multiplayer
 	# Maybe have a score-fields Array in the bottom bar, where each field has a reference to its player...?
 	# Then you could also sort however you please!
 
-	$mid.refresh;
-	$bot.refresh;
 	nc_refresh;
+}
+
+# Render Pause Screen
+sub pause-screen(@windows) is export {
+
+	# Shortcuts
+	my $mid = @windows[2];
+	
+	# RENDER PAUSE SCREEN
+
+	# Print the Pause Screen Message
+	$mid.print-pause-screen-message;
+
+	nc_refresh;
+
 }
 
 # Render Game Over Screen
@@ -479,6 +559,7 @@ sub game-over-screen (@windows, $high-score) is export {
 
 	# Refresh
 	@windows all "refresh";
+	nc_refresh;
 
 	move(0,0);
 }

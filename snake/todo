@@ -1,6 +1,7 @@
 
 
 NOTE: I've disabled the autocmd that changes the vim guicursor to a pipe-line. That was the cause of 'q's showing up in tmux....
+NOTE: My game pause isn't actually a game pause, cause the timers keep ticking, they just stop doing things. I think it's just about fine enough for me...
 
 
 NEXT UP:
@@ -9,16 +10,8 @@ NEXT UP:
 
 	- bug: snake just randomly quit, claiming a segment doesn't have a y-field...? one time error?
 
-	- add pause screen
-		- requires the motion intervals to be stopped
-			→ they have a current speed, eh? rename init-timers to start-timers
-			→ have the Timer.pause method add an interval, that just does nothing
-			→ have the Timer.resume method add an interval, that again does the normal things
-		- requires the Timers to be stored in a field upon Snake instantiation
-			→ make it so the $.timer field can remain uninitialized til after the Snake creation
-
 	- snake head with ▲ ▶ ▼ ◀
 
-	- make snake start-direction variable (requires code to create snake in right direction)
+	- make snake start direction depend on the settings
 
 	- make methods, that can be private, private

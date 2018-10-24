@@ -7,6 +7,7 @@ use NativeCall;
 our $HEIGHT;
 our $WIDTH;
 our $GAME-OVER;
+our $GAME-PAUSE;
 our $SETTINGS;
 our @PLAYERS;
 our @FOODS;
@@ -105,7 +106,7 @@ class Timer {
 		# Emit a new interval supply
 		$.meta-supplier.emit( supply {
 			whenever Supply.interval($.current-speed) -> $v {
-				unless $GAME-OVER {
+				unless $GAME-OVER | $GAME-PAUSE {
 					$.parent-player.move;
 					render;
 				}
@@ -462,7 +463,8 @@ sub game-start {
 sub game {
 
 	# Make absolutely sure, that the game can begin!
-	our $GAME-OVER = False;
+	our $GAME-OVER 	= False;
+	our $GAME-PAUSE = False;
 
 	# Setup Game Logic things...
 	our @PLAYERS.push: Snake.create();
@@ -490,6 +492,9 @@ sub game {
 			# 108 = l, 261 = right_arrow
 			when 108 | KEY_RIGHT {	@PLAYERS[0].move(Right); render }
 
+			# 32 = Space, 112 = p
+			when 32 | 112 { game-pause }
+
 			# 115 = s
 			# when 115 { game-over }
 
@@ -501,6 +506,22 @@ sub game {
 	game-over;
 }
 
+# On Pause
+sub game-pause {
+
+	# Pause the game by stopping all the timers
+	$GAME-PAUSE = True;
+
+	# Render the pause screen
+	pause-screen(@WINDOWS);
+
+	# Wait for user interaction...
+	getch;
+
+	# ... and restart the game, once the user pressed a key
+	$GAME-PAUSE = False;
+	render;
+}
 
 # On Game Over
 sub game-over {
@@ -534,6 +555,11 @@ sub game-over {
 
 	# Either restart or power down NCurses and quit
 	if $restart { game } else { endwin; exit }
+
+	# Note: the while loop here may seem a bit meh, but I tried to
+	# not start a new game loop from within an endless loop, so I
+	# don't get annoying loop-stacking, which might make problems
+	# down the line.
 }
 
 # Kickoff!
