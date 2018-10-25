@@ -3,6 +3,12 @@
 NOTE: I've disabled the autocmd that changes the vim guicursor to a pipe-line. That was the cause of 'q's showing up in tmux....
 NOTE: My game pause isn't actually a game pause, cause the timers keep ticking, they just stop doing things. I think it's just about fine enough for me...
 
+NOTE: I am using mostly obvious indentation rules, eg { stay on the line the block's definition is on, etc... but a few special things have emerged
+      If there is more than one paragraph of code in a code block, before and after the code come empty lines, for readability. Same thing with comments.
+      I won't leave spaces between () and code, unless it serves readability. This is a thing I won't necessarily be consistent on!
+      And generally: I will break with notational convention, whenever it serves readability!
+
+
 
 NEXT UP:
 
@@ -10,8 +16,8 @@ NEXT UP:
 
 	- bug: snake just randomly quit, claiming a segment doesn't have a y-field...? one time error?
 
-	- snake head with ▲ ▶ ▼ ◀
-
 	- make snake start direction depend on the settings
 
 	- make methods, that can be private, private
+
+	- add a help text, that includes the keybindings (and the secret q to quit =) )

@@ -511,6 +511,21 @@ our sub render-game (@windows, @players, @foods) {
 	# Render Snake
 	for @players -> $player {
 		for $player.segments.kv -> $ind, $segment {
+
+			# If you are rendering the head of the Snake...
+			if $ind == 0 {
+				# Alright, bit of a hack cause I can't import the Direction enum due to circular dependancy (I really can't be bothered to refactor the class code into separate files...)
+				given $player.direction.perl {
+					when "Direction::Left"  { $mid.mvprintw($segment.y, $segment.x * 2, " ◀") }
+					when "Direction::Right" { $mid.mvprintw($segment.y, $segment.x * 2, " ▶") }
+					when "Direction::Up"    { $mid.mvprintw($segment.y, $segment.x * 2, " ▲") }
+					when "Direction::Down"  { $mid.mvprintw($segment.y, $segment.x * 2, " ▼") }
+				}
+
+				next;
+			}
+
+			# Render all the other segments
 			$mid.mvprintw($segment.y, $segment.x * 2, " ○");
 			$mid.move(0,0);
 		}
