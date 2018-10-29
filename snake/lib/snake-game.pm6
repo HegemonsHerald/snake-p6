@@ -148,10 +148,18 @@ class Snake {
 		my $start-point = Point.new(x => $x, y => $y);
 		my @start-points = [ $start-point ];
 
-		# ... then add all the rest of the body
+		# ... then add all the rest of the body...
 		loop (my $i = 1; $i < $SETTINGS.start-length; $i++) {
-			my $next-point = Point.new(x => (@start-points[$i - 1].x - 1), y => $y);
-			@start-points.push: $next-point;
+
+			# ... in the correct direction...
+			given $SETTINGS.start-direction {
+				# ... so if the snake starts moving upwards, the body needs to be created downwards, the other directions respectively
+				when Up    { my $next-point = Point.new(x => (@start-points[$i - 1].y + 1), x => $x); @start-points.push: $next-point }
+				when Down  { my $next-point = Point.new(x => (@start-points[$i - 1].y - 1), x => $x); @start-points.push: $next-point } 
+				when Left  { my $next-point = Point.new(x => (@start-points[$i - 1].x + 1), y => $y); @start-points.push: $next-point }
+				when Right { my $next-point = Point.new(x => (@start-points[$i - 1].x - 1), y => $y); @start-points.push: $next-point }
+			}
+			
 		}
 
 		# Create the Snake!

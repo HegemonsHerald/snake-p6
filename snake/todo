@@ -17,6 +17,7 @@ NEXT UP:
 	- bug: snake just randomly quit, claiming a segment doesn't have a y-field...? one time error?
 
 	- make snake start direction depend on the settings
+		- make the snake choose its start direction based on screen-size with a default...
 
 	- make methods, that can be private, private
 
