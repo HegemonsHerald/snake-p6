@@ -154,8 +154,8 @@ class Snake {
 			# ... in the correct direction...
 			given $SETTINGS.start-direction {
 				# ... so if the snake starts moving upwards, the body needs to be created downwards, the other directions respectively
-				when Up    { my $next-point = Point.new(x => (@start-points[$i - 1].y + 1), x => $x); @start-points.push: $next-point }
-				when Down  { my $next-point = Point.new(x => (@start-points[$i - 1].y - 1), x => $x); @start-points.push: $next-point } 
+				when Up    { my $next-point = Point.new(y => (@start-points[$i - 1].y + 1), x => $x); @start-points.push: $next-point }
+				when Down  { my $next-point = Point.new(y => (@start-points[$i - 1].y - 1), x => $x); @start-points.push: $next-point } 
 				when Left  { my $next-point = Point.new(x => (@start-points[$i - 1].x + 1), y => $y); @start-points.push: $next-point }
 				when Right { my $next-point = Point.new(x => (@start-points[$i - 1].x - 1), y => $y); @start-points.push: $next-point }
 			}
@@ -584,7 +584,7 @@ sub start-up ($height, $width, $speed, $interval, $length, $worth, $growth, $sta
 	init_pair(COLOR_PAIR_1, COLOR_BLUE, COLOR_YELLOW);
 	init_pair(COLOR_PAIR_2, COLOR_BLUE, -1);
 
-	# Make window size decisions
+	# Make window size based decisions
 	my ($h, $w) = $height, $width;
 	my $y = getmaxy(@WINDOWS[0]);
 	my $x = getmaxx(@WINDOWS[0]);
@@ -617,7 +617,7 @@ sub start-up ($height, $width, $speed, $interval, $length, $worth, $growth, $sta
 
 
 	# Let's make some windows...
-	# ...			  	height	   		width       	y			x
+	# ...				height			width		y			x
 	@WINDOWS.push: Top.new(		1,			$ABS-WIDTH,	0,			0,	"SNAKE!!!",	max-score);	# ... top bar
 	@WINDOWS.push: Middle.new(	$ABS-HEIGHT - 2,	$ABS-WIDTH,	1,			0);					# ... game board
 	@WINDOWS.push: Bottom.new(	1,			$ABS-WIDTH,	$ABS-HEIGHT - 1,	0,	max-score);			# ... bottom bar
