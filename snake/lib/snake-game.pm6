@@ -31,7 +31,7 @@ enum Direction is export <Up Down Left Right>;
 # A Timer that moves a Snake
 class Timer {
 
-	# A timer holds a reference to its player, so it can call its .move method.
+	# A timer holds a reference to its player, so it can call that player's .move method.
 	#
 	# Explanation of the Speed Change System:
 	# The Settings object holds a field: speed-change-interval.
@@ -289,11 +289,11 @@ class Snake {
 	# Collision Detection, but for Food Points
 	method !food-collision {
 
+		# Find out, wether the game board is completely full of snakes
+		my $board-filled = board-filled();
+
 		# If the game board isn't completely full of Snakes
-		# Note: If the board is full of Snakes the call to $food.next can't decide
-		# on a new Food point and won't return, which means the Game will crash instead
-		# of ending with a Game Over on the next motion by a Snake.
-		unless board-filled() {
+		unless $board-filled {
 
 			# Check for collisions with food objects
 			for @FOODS -> $food {
@@ -310,6 +310,14 @@ class Snake {
 					$food.next;
 				}
 			}
+
+			return
+		}
+
+		# If the board is filled...
+		if $board-filled {
+			$GAME-OVER =  True;
+			game-over
 		}
 	}
 }

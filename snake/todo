@@ -16,6 +16,8 @@ NEXT UP:
 
 	- bug: snake just randomly quit, claiming a segment doesn't have a y-field...? one time error?
 
+	- board-filled logic: the game is never going to eat the last food point... (do you even want to fix that?)
+
 	- make methods, that can be private, private
 
 	- add a help text, that includes the keybindings (and the secret q to quit =) )

@@ -20,13 +20,6 @@ use snake-game;
 # Basically just like rust, only worse keywords!
 # Note that declaring something with is export doesn't make that thing globally scoped.
 
-
-# Ok, what will I do?
-#
-# /bin/snake.p6
-# /lib/snake-ui.p6
-# /lib/snake-game.p6
-
 sub MAIN(Int $height=0, Int $width=0) {
 
 	# If $height and $width are equal to 0,
