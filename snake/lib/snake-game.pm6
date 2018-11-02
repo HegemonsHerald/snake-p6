@@ -110,6 +110,15 @@ class Timer {
 					$.parent-player.move;
 					render;
 				}
+				# wieso wieso wieso
+				# for some reason it doesn't die on death...
+				# but i think this game over is indeed reached...
+				# YES, something after this function finishes, doesn't do its job right
+				# hypothesis: is it again the interval (that little devil!)
+				if $GAME-OVER {
+					say "quack";
+					game-over;
+				}
 			}
 
 			# Note: You have to use whenever or .act here,
@@ -514,10 +523,11 @@ sub game {
 			# 115 = s
 			# when 115 { game-over }
 
-			default { say $input }
+			# default { say $input }
 		}
 
 	}
+	if $GAME-OVER { say "honkitonk" };
 
 	game-over;
 }
