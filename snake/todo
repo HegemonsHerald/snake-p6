@@ -13,10 +13,26 @@ NOTE: I am using mostly obvious indentation rules, eg { stay on the line the blo
 NEXT UP:
 
 	- bug: if the snake collides with its tail end, it collides with a segment, that'll be moved away. The game-over doesn't work there
+		- reason: getch.
+			  Since there is no timeout in the getch while loop in game() a call to getch is made,
+			  before that while loop can quit, when $GAME-OVER is set. That getch() call has to return
+			  before the while loop can end and thereby the game-over call from game() can be made.
 
-	- bug: snake just randomly quit, claiming a segment doesn't have a y-field...? one time error?
+			  Introducing a delay between keypresses helps, but makes the game harder to use.
 
-	- board-filled logic: the game is never going to eat the last food point... (do you even want to fix that?)
+			  Using getch it won't be possible to have the game check for $GAME-OVER again (after the getch call)
+			  after a while.
+
+			  A possible solution is yet another global flag variable, that tells the game, wether
+			  game-over() has already been called or not. If it has been called, no need for it to be
+			  called from after the while loop in game(). Obviously the collision detection code then
+			  has to call game-over(). I don't like this solution as it would stack function calls again,
+			  which I am trying to avoid... Also, I really don't want another global variable. I have
+			  too many of them anyways.
+
+			  This is a bug, that I will not fix, but at least I now understand it.
+
+	- board-filled logic: the game is never going to eat the last food point... (do you even want to fix that? (No, I don't))
 
 	- make methods, that can be private, private
 

@@ -87,7 +87,7 @@ class Timer {
 			}
 
 			# If game over, make the interval stop!
-			self!clear-interval;
+			self.clear-interval;
 
 			# Close the Supply
 			$.meta-supplier.done;
@@ -96,8 +96,9 @@ class Timer {
 	}
 
 	# A function to set the interval Supply to not be an interval Supply
-	method !clear-interval {
+	method clear-interval {
 		$.meta-supplier.emit: supply { }
+		say "Quack";
 	}
 
 	# A function to change the speed of the movement interval
@@ -109,15 +110,6 @@ class Timer {
 				unless $GAME-OVER | $GAME-PAUSE {
 					$.parent-player.move;
 					render;
-				}
-				# wieso wieso wieso
-				# for some reason it doesn't die on death...
-				# but i think this game over is indeed reached...
-				# YES, something after this function finishes, doesn't do its job right
-				# hypothesis: is it again the interval (that little devil!)
-				if $GAME-OVER {
-					say "quack";
-					game-over;
 				}
 			}
 
@@ -181,7 +173,7 @@ class Snake {
 	}
 
 	method kill-timer {
-		$.timer.kill;
+		$.timer.clear-interval;
 	}
 
 
@@ -196,6 +188,7 @@ class Snake {
 			unless $.growth > 0 {
 				# Remove a piece from the end of the snake, so it doesn't grow
 				self!pop-tail();
+
 				return;
 			}
 
@@ -235,7 +228,6 @@ class Snake {
 
 		# Collision Detection: Is it even possible to insert?
 		if self!collision($point) {
-			# say "Uh-oH, that was a collision!";
 
 			# Self Collisions mean Game Over
 			return False;
@@ -278,10 +270,10 @@ class Snake {
 
 	# 0 to 90 Degrees turning test, returns True if turn possible (90 degrees or less)
 	method !check-turn( Direction $dir ) {
-		if $dir == Left && self.direction == Right { return False }
-		if $dir == Right && self.direction == Left { return False }
-		if $dir == Down && self.direction == Up { return False }
-		if $dir == Up && self.direction == Down { return False }
+		if $dir == Left 	&& self.direction == Right	{ return False }
+		if $dir == Right	&& self.direction == Left 	{ return False }
+		if $dir == Down 	&& self.direction == Up   	{ return False }
+		if $dir == Up   	&& self.direction == Down 	{ return False }
 		return True
 	}
 
@@ -449,6 +441,7 @@ sub purge {
 	$GAME-OVER = True;
 
 	until @PLAYERS.elems == 0 {
+		@PLAYERS[@PLAYERS.elems - 1].kill-timer;
 		@PLAYERS.pop;
 	}
 
@@ -527,6 +520,7 @@ sub game {
 		}
 
 	}
+
 	if $GAME-OVER { say "honkitonk" };
 
 	game-over;
