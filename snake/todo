@@ -32,8 +32,6 @@ NEXT UP:
 
 			  This is a bug, that I will not fix, but at least I now understand it.
 
-	- board-filled logic: the game is never going to eat the last food point... (do you even want to fix that? (No, I don't))
-
 	- make methods, that can be private, private
 
 	- add a help text, that includes the keybindings (and the secret q to quit =) )
