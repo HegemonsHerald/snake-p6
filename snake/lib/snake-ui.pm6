@@ -4,6 +4,7 @@ use NativeCall;
 
 unit module snake-ui;
 
+
 # Welcome, Pause and Game Over Screen messages
 
 # WELCOME SCREEN
@@ -154,6 +155,10 @@ our @PAUSE-SCREEN-MESSAGE-OPTIONS = [
 	@PAUSE-SCREEN-MESSAGE,
 ];
 
+
+
+# NativeCall and Subroutine declarations
+
 # setlocale from libc, sets the locale for the native Strings, that are passed to NCurses and makes NCurses use wide/unicode chars
 sub setlocale(int32, Str) returns Str is native(Str) {*};
 
@@ -190,6 +195,10 @@ sub infix:<all>(@w, $m) {
 	# Note: this makes use of the quoted method call syntax, which allows you to substitute the method name from inside a variable!
 	# This is friggin' brilliant [perl 5 can do that, too!]
 }
+
+
+
+# Class definitions
 
 # Fields in the top bar and the bottom bar
 # This is just a convenient way of storing, where the printw has to start to overwrite status info, like the player's High Score...
@@ -259,19 +268,13 @@ class Window is export {
 		return self.bless(:$height, :$width, :$y, :$x, :$window)
 	}
 
-	# Fill the window with spaces to set the background color!
+	# Fill the window with spaces to set the background color (to whatever has been set before)!
 	multi method bkgd {
 		for 0..$.height -> $index {
 			mvwhline($.window, $index, $.x, 32, $.width)
 		}
 	}
 
-	multi method bkgd ($color-pair) {
-		wcolor_set($.window, $color-pair, 0);
-		$.bkgd;
-	}
-
-	# Delete the window
 	method delwin {
 		delwin($.window);
 		nc_refresh;
@@ -445,6 +448,9 @@ class Bottom is Window is export {
 	}
 }
 
+
+
+# State Overlays
 
 # Render Initial Welcome Screen
 sub welcome-screen (@windows, $high-score) is export {

@@ -4,6 +4,7 @@ use snake-ui;
 use NCurses;
 use NativeCall;
 
+# Global State Vars yay!
 our $HEIGHT;
 our $WIDTH;
 our $GAME-OVER;
@@ -31,14 +32,27 @@ enum Direction is export <Up Down Left Right>;
 # A Timer that moves a Snake
 class Timer {
 
-	# A timer holds a reference to its player, so it can call that player's .move method.
+	# A Timer holds a reference to its player, so it can call that player's .move method.
 	#
 	# Explanation of the Speed Change System:
 	# The Settings object holds a field: speed-change-interval.
-	# The timer holds a field: speed-counter.
-	# Whenever the speed-counter lacks behind the timer's player's score by the value in speed-change-interval, (player.score - settings.speed-change-interval == timer.speed-counter)
-	# the timer will increase the player's speed.
+	# The Timer holds a field: speed-counter.
+	# Whenever the speed-counter lacks behind the Timer's player's score by the value in speed-change-interval, (player.score - settings.speed-change-interval == timer.speed-counter)
+	# the Timer will increase the player's speed.
 	# ... so, whenever a player has made speed-change-interval many points, the speed will increase by 0.1 seconds/tick
+
+	# Explanation of the Migration model
+	#
+	# You have one meta Supplier. That Supplier supplies Supplies.
+	# Each of the Supplies you get from the meta Supplier is an interval.
+	# So, when the speed of the motion interval is supposed to change, you can send a new interval with the correct speed
+	# down the meta Supplier, which then replaces the previous one.
+	# That way the interval is updated.
+	#
+	# $.meta-supplier is the meta Supplier.
+	# The Promise in start() calls !change-interval which emits a new interval down the meta-supplier.
+	#
+	# (Here's sincerely hoping that's enough explanation, check out the docs on the migrate method for more)
 
 	has $.parent-player;
 	has $.meta-supplier;
@@ -48,7 +62,7 @@ class Timer {
 
 	method new ($parent-player) {
 
-		# A supplier to supply the interval supplies
+		# A supplier to supply the interval supplies (I know...)
 		my $meta-supplier = Supplier.new;
 
 		self.bless(:$parent-player, :$meta-supplier);
@@ -61,12 +75,17 @@ class Timer {
 		$.meta-supplier.Supply.migrate.tap: *.say;
 		# .say on a supply-block executes the code, so the supplies,
 		# that are returned from this tap are executed
+		#
+		# This meta-supplier.Supply supplies a Supply.
+		# migrate makes the meta-supplier.Supply supply the next Supply, whenever
+		# a new Supply is emitted on meta-supplier.
 
+		# Make intervals asyncronously
 		$.promise = Promise.start({
 
 			while !$GAME-OVER {
 
-				# If speed-counter is in initial state, kick off the intervall
+				# If speed-counter is in initial state, kick off the interval
 				if $.speed-counter == -1 {
 					self!change-interval;
 					$.speed-counter = 0;
@@ -77,7 +96,7 @@ class Timer {
 					# Set a new interval speed
 					$.current-speed = self!new-speed;
 
-					# Update the interval
+					# Update the interval to reflect the new speed
 					self!change-interval;
 
 					# And update the counter
@@ -98,22 +117,29 @@ class Timer {
 	# A function to set the interval Supply to not be an interval Supply
 	method clear-interval {
 		$.meta-supplier.emit: supply { }
-		say "Quack";
 	}
 
 	# A function to change the speed of the movement interval
 	method !change-interval {
 
+		# Note: this function is explained in the second paragraph at the beginning of this Class' definition.
+
 		# Emit a new interval supply
 		$.meta-supplier.emit( supply {
+
+			# Whenever the interval ticks...
 			whenever Supply.interval($.current-speed) -> $v {
+
+				# ... and it's neither Game Over nor Pause...
 				unless $GAME-OVER | $GAME-PAUSE {
+
+					# ... make the player move!
 					$.parent-player.move;
 					render;
 				}
 			}
 
-			# Note: You have to use whenever or .act here,
+			# Note: You have to use 'whenever' or '.act' here,
 			# because if the handler isn't run single-threaded it
 			# doesn't work for some reason...
 			# Also, the supply handler has to be defined in
@@ -343,9 +369,6 @@ class Food {
 		my $px = $WIDTH.rand.floor;
 		my $py = $HEIGHT.rand.floor;
 
-		# say "$py	$px";
-		# say "$HEIGHT	$WIDTH";
-
 		for @PLAYERS -> $player {
 
 			# Here's how you can destructure an Object, note that you have to use the field's actual names
@@ -368,7 +391,7 @@ class Food {
 
 # Settings object
 class Settings {
-	has $.high-score is rw;
+	has $.high-score is rw;		# ...
 	has $.start-speed;		# How fast a snake is at the start, in delta seconds between ticks
 	has $.speed-change-interval;	# How many points a player has to make, til he gets a speed increase
 	has $.start-score;		# How many points a snake has at the start
@@ -412,6 +435,7 @@ sub board-filled {
 }
 
 # Function to output the current snake segments
+# This is a Debug Function
 sub say-snake {
 	print "|";
 	for @PLAYERS[0].segments -> $segment {
@@ -521,8 +545,6 @@ sub game {
 
 	}
 
-	if $GAME-OVER { say "honkitonk" };
-
 	game-over;
 }
 
@@ -576,13 +598,13 @@ sub game-over {
 	# Either restart or power down NCurses and quit
 	if $restart { game } else { endwin; exit }
 
-	# Note: the while loop here may seem a bit meh, but I tried to
-	# not start a new game loop from within an endless loop, so I
-	# don't get annoying loop-stacking, which might make problems
-	# down the line.
+	# Note: the while-loop-$restart-combo here may seem a bit meh,
+	# but I tried to not start a new game loop from within an
+	# endless loop, so I don't get annoying loop-stacking,
+	# which might make problems down the line.
 }
 
-# Kickoff!
+# Kickoff! (This one's called from MAIN in snake.p6)
 sub start-up ($height, $width, $speed, $interval, $length, $worth, $growth, $start-direction) is export {
 
 	# Init NCurses
