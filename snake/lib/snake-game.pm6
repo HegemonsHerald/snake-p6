@@ -566,6 +566,7 @@ sub game-pause {
 }
 
 # On Game Over
+# Note: you can use 'q' to quit from the game over screen, it doesn't say that anywhere
 sub game-over {
 
 	# Update High-Score

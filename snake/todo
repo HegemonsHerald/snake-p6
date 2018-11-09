@@ -33,7 +33,3 @@ NEXT UP:
 			  This is a bug, that I will not fix, but at least I now understand it.
 
 			  ⇒ research: perl6 timeout, call function with timeout, kill function call
-
-	- make methods, that can be private, private
-
-	- add a help text, that includes the keybindings (and the secret q to quit =) )
